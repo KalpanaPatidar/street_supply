@@ -1,0 +1,11 @@
+product_id,name,category,price,supplier,stock,discount,rating
+1,Mustard Oil,Edible Oil,120,Supplier A,25,10,4.5
+2,Basmati Rice,Grains,70,Supplier B,50,5,4.2
+3,Whole Wheat Flour,Grains,45,Supplier C,40,0,4.6
+4,Tomato Ketchup,Sauces,55,Supplier D,20,15,4.0
+5,Buffalo Milk,Dairy,60,Supplier E,60,5,4.3
+6,Turmeric Powder,Spices,40,Supplier F,35,10,4.7
+7,Coriander Powder,Spices,35,Supplier G,30,0,4.4
+8,Dishwashing Liquid,Cleaning Supplies,80,Supplier H,15,20,4.1
+9,Paper Plates,Packaging Material,30,Supplier I,100,5,3.9
+10,Sugar,Sweetener,50,Supplier J,70,0,4.0
