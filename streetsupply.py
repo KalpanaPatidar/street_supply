@@ -81,3 +81,15 @@ elif menu == "Orders":
     st.info("📦 This is your order history. (Simulation only in MVP)")
     st.warning("Coming soon: Delivery tracking, cancellation, and reviews!")
 
+st.markdown("""
+<style>
+h1 {
+    font-size: 42px;
+    color: #FF4B4B;
+    font-weight: bold;
+}
+.sidebar .sidebar-content {
+    background-color: #f7f7f7;
+}
+</style>
+""", unsafe_allow_html=True)
