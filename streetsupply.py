@@ -20,7 +20,7 @@ menu = st.sidebar.radio("Navigate", ["Home", "Search", "Departments", "Cart", "W
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
 
-# Home Page
+#Home page
 if menu == "Home":
     st.success("Welcome to Bhojan Bazaar. Find trusted suppliers, compare prices, and save time!")
     st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
