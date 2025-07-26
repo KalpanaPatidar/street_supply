@@ -93,3 +93,68 @@ h1 {
 }
 </style>
 """, unsafe_allow_html=True)
+
+
+import streamlit as st
+import pandas as pd
+
+# Load updated product data
+products = pd.read_csv("india_products_with_locations.csv")
+
+st.title("🔍 Search by Location and Product")
+
+# Step 1: Ask for location
+location_input = st.text_input("📍 Enter your location (e.g., Bhawarkua, Indore)")
+
+# Step 2: Ask for product keyword
+keyword_input = st.text_input("🔎 Enter product name (e.g., Oil, Rice, Milk)")
+
+# Step 3: Filter results
+if location_input or keyword_input:
+    filtered = products.copy()
+    if location_input:
+        filtered = filtered[filtered['supplier_location'].str.contains(location_input, case=False)]
+    if keyword_input:
+        filtered = filtered[filtered['name'].str.contains(keyword_input, case=False)]
+
+    if not filtered.empty:
+        st.success(f"✅ Found {len(filtered)} matching products.")
+        st.dataframe(filtered[['name', 'supplier', 'supplier_location', 'price', 'discount', 'rating', 'delivery_charge']])
+    else:
+        st.warning("⚠️ No matching products found.")
+# --- Checkout Form ---
+st.subheader("📦 Delivery Details")
+with st.form("checkout_form"):
+    name = st.text_input("👤 Full Name")
+    phone = st.text_input("📞 Phone Number")
+    address = st.text_area("🏠 Delivery Address")
+    city = st.text_input("🏙️ City")
+    pincode = st.text_input("📮 Pincode")
+    pay_mode = st.radio("💳 Payment Mode", ["Cash on Delivery", "Pay Online (Razorpay)"])
+    submitted = st.form_submit_button("🛍️ Confirm & Pay")
+
+    if submitted:
+        if name and phone and address and city and pincode:
+            st.success("✅ Order confirmed! Redirecting to payment..." if pay_mode == "Pay Online (Razorpay)" else "✅ Order placed with COD.")
+            if pay_mode == "Pay Online (Razorpay)":
+                st.markdown("Visit [Razorpay Demo Payment Page](https://rzp.io/l/NF6yVOS) to simulate payment.")  # Replace with your live URL
+        else:
+            st.error("❌ Please fill all the required fields.")
+import razorpay
+
+# Replace with your test keys
+client = razorpay.Client(auth=("YOUR_KEY_ID", "YOUR_SECRET"))
+
+order_data = {
+    "amount": 5000,  # ₹50.00 in paise
+    "currency": "INR",
+    "payment_capture": "1"
+}
+order = client.order.create(data=order_data)
+st.write("✅ Razorpay Order ID:", order['id'])
+
+st.markdown(f"""
+<a href="https://rzp.io/l/YOUR_PAYMENT_LINK" target="_blank">
+    <button style="background-color:#4CAF50;color:white;padding:10px;border:none;border-radius:5px;">💳 Proceed to Pay with Razorpay</button>
+</a>
+""", unsafe_allow_html=True)
