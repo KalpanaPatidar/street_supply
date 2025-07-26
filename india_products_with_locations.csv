@@ -1,0 +1,101 @@
+product_id,name,category,price,supplier,supplier_location,stock,discount,rating,delivery_available,delivery_charge
+1,Mustard Oil,Edible Oil,73,Supplier B,"Saket, Delhi",42,10,3.7,Yes,10
+2,Basmati Rice,Grains,101,Supplier C,"Dum Dum, Kolkata",64,15,3.7,Yes,20
+3,Wheat Flour,Grains,117,Supplier D,"Koramangala, Bengaluru",75,0,3.8,Yes,15
+4,Tomato Ketchup,Sauces,50,Supplier E,"Begumpet, Hyderabad",31,5,4.3,Yes,15
+5,Buffalo Milk,Dairy,148,Supplier F,"Begumpet, Hyderabad",51,15,4.8,Yes,10
+6,Turmeric Powder,Spices,78,Supplier G,"Salt Lake, Kolkata",50,10,4.4,Yes,30
+7,Coriander Powder,Spices,54,Supplier H,"Hitech City, Hyderabad",46,5,3.6,Yes,10
+8,Dishwashing Liquid,Cleaning Supplies,114,Supplier I,"Dadar, Mumbai",61,0,4.3,Yes,15
+9,Paper Plates,Packaging Material,78,Supplier J,"Gariahat, Kolkata",18,5,4.5,Yes,20
+10,Sugar,Sweetener,46,Supplier K,"Begumpet, Hyderabad",76,0,3.6,Yes,30
+11,Mustard Oil,Edible Oil,149,Supplier L,"Salt Lake, Kolkata",25,10,3.6,Yes,10
+12,Basmati Rice,Grains,65,Supplier M,"Indiranagar, Bengaluru",75,0,3.6,Yes,20
+13,Wheat Flour,Grains,72,Supplier N,"Rajwada, Indore",47,5,4.4,Yes,10
+14,Tomato Ketchup,Sauces,83,Supplier O,"Gariahat, Kolkata",86,5,3.9,Yes,15
+15,Buffalo Milk,Dairy,40,Supplier P,"MG Road, Bengaluru",43,5,4.7,Yes,30
+16,Turmeric Powder,Spices,59,Supplier Q,"Palasia, Indore",63,0,4.8,Yes,15
+17,Coriander Powder,Spices,31,Supplier R,"Dadar, Mumbai",37,15,4.9,Yes,15
+18,Dishwashing Liquid,Cleaning Supplies,39,Supplier S,"Howrah, Kolkata",57,10,3.8,Yes,15
+19,Paper Plates,Packaging Material,111,Supplier T,"Vijay Nagar, Indore",44,0,4.2,Yes,15
+20,Sugar,Sweetener,48,Supplier U,"Bhawarkua, Indore",52,15,4.2,Yes,15
+21,Mustard Oil,Edible Oil,66,Supplier V,"Tambaram, Chennai",28,10,3.9,Yes,20
+22,Basmati Rice,Grains,87,Supplier W,"MG Road, Bengaluru",53,5,4.2,Yes,25
+23,Wheat Flour,Grains,100,Supplier X,"Jayanagar, Bengaluru",17,5,4.6,Yes,10
+24,Tomato Ketchup,Sauces,134,Supplier Y,"Palasia, Indore",26,0,4.8,Yes,30
+25,Buffalo Milk,Dairy,146,Supplier Z,"Dum Dum, Kolkata",49,5,3.8,Yes,25
+26,Turmeric Powder,Spices,35,Supplier A,"Salt Lake, Kolkata",59,0,4.8,Yes,25
+27,Coriander Powder,Spices,49,Supplier B,"Borivali, Mumbai",26,10,4.6,Yes,10
+28,Dishwashing Liquid,Cleaning Supplies,84,Supplier C,"Rajwada, Indore",58,5,4.1,Yes,25
+29,Paper Plates,Packaging Material,99,Supplier D,"Charminar, Hyderabad",17,10,3.7,Yes,15
+30,Sugar,Sweetener,64,Supplier E,"Gachibowli, Hyderabad",53,5,4.9,Yes,25
+31,Mustard Oil,Edible Oil,86,Supplier F,"MG Road, Bengaluru",42,0,4.4,Yes,15
+32,Basmati Rice,Grains,136,Supplier G,"Indiranagar, Bengaluru",38,10,4.3,Yes,15
+33,Wheat Flour,Grains,38,Supplier H,"Whitefield, Bengaluru",94,5,4.1,Yes,25
+34,Tomato Ketchup,Sauces,41,Supplier I,"Charminar, Hyderabad",11,10,4.1,Yes,25
+35,Buffalo Milk,Dairy,56,Supplier J,"Gariahat, Kolkata",43,5,4.2,Yes,30
+36,Turmeric Powder,Spices,135,Supplier K,"Bhawarkua, Indore",72,10,3.7,Yes,30
+37,Coriander Powder,Spices,39,Supplier L,"Dadar, Mumbai",42,0,4.0,Yes,25
+38,Dishwashing Liquid,Cleaning Supplies,127,Supplier M,"Salt Lake, Kolkata",46,15,3.7,Yes,20
+39,Paper Plates,Packaging Material,122,Supplier N,"MG Road, Bengaluru",26,15,3.6,Yes,15
+40,Sugar,Sweetener,53,Supplier O,"Charminar, Hyderabad",94,15,3.6,Yes,20
+41,Mustard Oil,Edible Oil,123,Supplier P,"Howrah, Kolkata",74,10,3.5,Yes,10
+42,Basmati Rice,Grains,111,Supplier Q,"MG Road, Bengaluru",99,15,3.9,Yes,20
+43,Wheat Flour,Grains,122,Supplier R,"Bandra, Mumbai",95,15,4.4,Yes,10
+44,Tomato Ketchup,Sauces,79,Supplier S,"Salt Lake, Kolkata",99,0,4.2,Yes,10
+45,Buffalo Milk,Dairy,41,Supplier T,"MG Road, Bengaluru",32,5,4.2,Yes,20
+46,Turmeric Powder,Spices,110,Supplier U,"Tambaram, Chennai",59,0,5.0,Yes,10
+47,Coriander Powder,Spices,109,Supplier V,"Rajwada, Indore",42,5,3.9,Yes,30
+48,Dishwashing Liquid,Cleaning Supplies,127,Supplier W,"Anna Nagar, Chennai",89,15,3.9,Yes,10
+49,Paper Plates,Packaging Material,76,Supplier X,"Hitech City, Hyderabad",100,0,4.8,Yes,30
+50,Sugar,Sweetener,82,Supplier Y,"Bandra, Mumbai",71,10,4.6,Yes,25
+51,Mustard Oil,Edible Oil,62,Supplier Z,"Rajwada, Indore",68,5,4.9,Yes,15
+52,Basmati Rice,Grains,41,Supplier A,"Bandra, Mumbai",78,5,3.6,Yes,15
+53,Wheat Flour,Grains,111,Supplier B,"MG Road, Indore",80,15,4.5,Yes,25
+54,Tomato Ketchup,Sauces,81,Supplier C,"Borivali, Mumbai",48,0,4.4,Yes,10
+55,Buffalo Milk,Dairy,114,Supplier D,"Koramangala, Bengaluru",90,5,4.7,Yes,25
+56,Turmeric Powder,Spices,85,Supplier E,"Bhawarkua, Indore",66,15,5.0,Yes,30
+57,Coriander Powder,Spices,108,Supplier F,"Jayanagar, Bengaluru",21,5,4.2,Yes,20
+58,Dishwashing Liquid,Cleaning Supplies,125,Supplier G,"Anna Nagar, Chennai",15,5,4.2,Yes,30
+59,Paper Plates,Packaging Material,147,Supplier H,"Connaught Place, Delhi",90,15,4.8,Yes,30
+60,Sugar,Sweetener,32,Supplier I,"T Nagar, Chennai",30,15,3.8,Yes,30
+61,Mustard Oil,Edible Oil,53,Supplier J,"Karol Bagh, Delhi",41,15,4.9,Yes,10
+62,Basmati Rice,Grains,48,Supplier K,"Charminar, Hyderabad",38,10,4.2,Yes,20
+63,Wheat Flour,Grains,123,Supplier L,"Bhawarkua, Indore",84,10,4.7,Yes,15
+64,Tomato Ketchup,Sauces,117,Supplier M,"Borivali, Mumbai",22,0,4.8,Yes,20
+65,Buffalo Milk,Dairy,67,Supplier N,"Borivali, Mumbai",20,10,4.5,Yes,30
+66,Turmeric Powder,Spices,118,Supplier O,"MG Road, Indore",36,10,4.0,Yes,25
+67,Coriander Powder,Spices,81,Supplier P,"Vijay Nagar, Indore",80,15,4.8,Yes,15
+68,Dishwashing Liquid,Cleaning Supplies,137,Supplier Q,"Velachery, Chennai",15,5,4.1,Yes,25
+69,Paper Plates,Packaging Material,53,Supplier R,"Thane, Mumbai",81,10,4.8,Yes,25
+70,Sugar,Sweetener,80,Supplier S,"Whitefield, Bengaluru",27,0,3.9,Yes,10
+71,Mustard Oil,Edible Oil,34,Supplier T,"Salt Lake, Kolkata",85,0,3.9,Yes,25
+72,Basmati Rice,Grains,127,Supplier U,"Howrah, Kolkata",54,0,4.7,Yes,30
+73,Wheat Flour,Grains,108,Supplier V,"Jayanagar, Bengaluru",33,0,4.8,Yes,15
+74,Tomato Ketchup,Sauces,114,Supplier W,"Anna Nagar, Chennai",24,5,4.0,Yes,20
+75,Buffalo Milk,Dairy,126,Supplier X,"Karol Bagh, Delhi",63,5,4.7,Yes,15
+76,Turmeric Powder,Spices,53,Supplier Y,"Rajwada, Indore",44,15,3.8,Yes,30
+77,Coriander Powder,Spices,107,Supplier Z,"Adyar, Chennai",49,0,3.8,Yes,20
+78,Dishwashing Liquid,Cleaning Supplies,60,Supplier A,"Park Street, Kolkata",17,15,4.5,Yes,10
+79,Paper Plates,Packaging Material,54,Supplier B,"Dwarka, Delhi",77,0,4.0,Yes,20
+80,Sugar,Sweetener,51,Supplier C,"Velachery, Chennai",77,0,4.2,Yes,30
+81,Mustard Oil,Edible Oil,33,Supplier D,"Dadar, Mumbai",78,10,4.6,Yes,20
+82,Basmati Rice,Grains,143,Supplier E,"Borivali, Mumbai",44,5,4.5,Yes,20
+83,Wheat Flour,Grains,110,Supplier F,"Salt Lake, Kolkata",30,15,4.5,Yes,15
+84,Tomato Ketchup,Sauces,54,Supplier G,"Tambaram, Chennai",52,15,4.7,Yes,20
+85,Buffalo Milk,Dairy,142,Supplier H,"Adyar, Chennai",55,15,4.4,Yes,20
+86,Turmeric Powder,Spices,125,Supplier I,"Bhawarkua, Indore",50,15,4.3,Yes,10
+87,Coriander Powder,Spices,104,Supplier J,"MG Road, Bengaluru",41,10,3.7,Yes,20
+88,Dishwashing Liquid,Cleaning Supplies,30,Supplier K,"Borivali, Mumbai",61,15,4.3,Yes,25
+89,Paper Plates,Packaging Material,53,Supplier L,"Dadar, Mumbai",73,5,4.2,Yes,15
+90,Sugar,Sweetener,35,Supplier M,"Connaught Place, Delhi",80,10,4.6,Yes,25
+91,Mustard Oil,Edible Oil,88,Supplier N,"Karol Bagh, Delhi",81,0,3.9,Yes,10
+92,Basmati Rice,Grains,134,Supplier O,"Andheri, Mumbai",77,5,4.4,Yes,15
+93,Wheat Flour,Grains,126,Supplier P,"Bhawarkua, Indore",21,15,4.0,Yes,30
+94,Tomato Ketchup,Sauces,85,Supplier Q,"Salt Lake, Kolkata",55,15,4.9,Yes,20
+95,Buffalo Milk,Dairy,40,Supplier R,"Velachery, Chennai",95,10,4.4,Yes,10
+96,Turmeric Powder,Spices,105,Supplier S,"Dwarka, Delhi",69,5,4.4,Yes,30
+97,Coriander Powder,Spices,119,Supplier T,"Velachery, Chennai",19,0,4.9,Yes,15
+98,Dishwashing Liquid,Cleaning Supplies,144,Supplier U,"Anna Nagar, Chennai",24,10,4.3,Yes,20
+99,Paper Plates,Packaging Material,66,Supplier V,"Tambaram, Chennai",96,5,3.7,Yes,15
+100,Sugar,Sweetener,62,Supplier W,"Gariahat, Kolkata",95,15,4.1,Yes,10
