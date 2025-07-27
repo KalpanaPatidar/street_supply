@@ -114,8 +114,8 @@ if search:
         results = results[results['supplier_location'].str.contains("Indore", case=False)]
     if results.empty:
         st.info("No products found matching the search criteria.")
-    for _, row in results.iterrows():
-    with st.form(key=f"form_{row['product_id']}"):
+     for _, row in results.iterrows():
+       with st.form(key=f"form_{row['product_id']}"):
         st.markdown(f"""
         **{row['name']}** from **{row['supplier']}**  
         Price: ₹{row['price']} | Discounted: ₹{row['price']*(1 - row['discount']/100):.2f}  
