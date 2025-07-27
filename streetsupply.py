@@ -3,7 +3,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+# st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
 
 # Stylish Heading & Subheading
@@ -48,15 +48,15 @@ if 'selected_category' not in st.session_state:
 products = pd.read_csv("india_products_with_locations.csv")
 
 # Header Bar
-header_cols = st.columns([1, 7, 1, 1, 1, 1])
-with header_cols[0]:
-    if st.button("🏠", help="Home"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
-with header_cols[4]:
-    if st.button("👤 Account"):
-        st.session_state.menu = "Account"
+# header_cols = st.columns([1, 7, 1, 1, 1, 1])
+# with header_cols[0]:
+#     if st.button("🏠", help="Home"):
+#         st.session_state.menu = "Home"
+#         st.session_state.selected_category = None
+#         st.rerun()
+# with header_cols[4]:
+#     if st.button("👤 Account"):
+#         st.session_state.menu = "Account"
 
 # Centered Search
 st.markdown("""
