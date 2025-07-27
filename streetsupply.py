@@ -157,7 +157,7 @@ if search:
     for _, row in results.iterrows():
 st.markdown(f"""
 **{row['name']}** from *{row['supplier']}*  
-Price: ₹{row['price']} | Discounted: ₹{row['price'] * (1 - row['discount'] / 100):.2f}  
+Price: ₹{row['price']} | Discounted: Rs{row['price'] * (1 - row['discount'] / 100):.2f}  
 Rating: {row['rating']} | Location: {row['supplier_location']} | Delivery: ₹{row['delivery_charge']}
 """)
 
