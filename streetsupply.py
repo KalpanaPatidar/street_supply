@@ -76,19 +76,9 @@ with col_account:
     if st.button("👤 Account"):
         st.session_state.menu = "Account"
 
-# Functional buttons for 🏠 and 👤
-col1, col2, col3 = st.columns([1, 8, 1])
-with col1:
-    if st.button("🏠", key="home_actual"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
-with col3:
-    if st.button("👤 Account", key="account_actual"):
-        st.session_state.menu = "Account"
 
-# Capture the search query
-search = st.text_input("", placeholder="Search 9000+ products", key="search_real")
+
+
 
 # Nearest Location Toggle (only if something is searched)
 if search:
@@ -119,7 +109,7 @@ def add_to_wishlist(pid):
 # Account Page
 if st.session_state.menu == "Account":
     st.subheader("👤 Your Profile")
-    if st.button("✏️ Edit Profile"):
+    if st.button("✏ Edit Profile"):
         st.session_state.edit_mode = not st.session_state.get("edit_mode", False)
     edit = st.session_state.get("edit_mode", False)
     name = st.text_input("Full Name", value="Kishan Vendor", disabled=not edit)
@@ -146,7 +136,7 @@ if search:
         st.info("No products found matching the search criteria.")
     for _, row in results.iterrows():
         st.markdown(f"""
-        **{row['name']}** from **{row['supplier']}**  
+        *{row['name']}* from *{row['supplier']}*  
         Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
         ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
         """)
@@ -160,6 +150,8 @@ if search:
         with col3:
             st.button("Order Now", key=f"order_{row['product_id']}")
         st.markdown("---")
+
+
 
 # Home Page - Categories with Grid
 elif st.session_state.menu == "Home":
