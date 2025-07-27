@@ -197,7 +197,7 @@ if 'orders' not in st.session_state:
     ]
 
 # Load Data
-products = pd.read_csv("products.csv")
+products = pd.read_csv("india_products_with_locations.csv")
 
 # Header Bar
 col1, col2, col3, col4, col5 = st.columns([4, 2, 1, 1, 1])
