@@ -339,7 +339,187 @@ elif menu == "Wishlist":
 
 elif menu == "Orders":
     st.subheader("📦 Your Orders")
-    st.warning("Login is disabled in this version. Order history not saved.")
+  from datetime import datetime
+import json
+import os
+
+# ========================== CONFIG ==========================
+
+st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+
+# ===================== User Management =======================
+
+USERS_FILE = "users.json"
+
+def load_users():
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+
+def signup_user(email, password):
+    users = load_users()
+    if email in users:
+        return False, "User already exists."
+    users[email] = {"password": password, "cart": [], "wishlist": [], "orders": []}
+    save_users(users)
+    return True, "Account created successfully."
+
+def login_user(email, password):
+    users = load_users()
+    if email in users and users[email]["password"] == password:
+        return True
+    return False
+
+# ====================== Load Product Data ====================
+
+@st.cache_data
+
+def load_data():
+    return pd.read_csv("products.csv")
+
+products = load_data()
+
+# ===================== Session Initialization ===============
+
+for key in ['authenticated', 'user_email', 'page']:
+    if key not in st.session_state:
+        st.session_state[key] = None if key != 'page' else 'Login'
+
+# ========== AUTH UI: SIGN UP / LOGIN SYSTEM ==================
+
+if not st.session_state.authenticated:
+    st.title("🔐 Welcome to Bhojan Bazaar")
+
+    tab1, tab2 = st.tabs(["Login", "Sign Up"])
+
+    with tab1:
+        login_email = st.text_input("Email", key="login_email")
+        login_pass = st.text_input("Password", type="password", key="login_pass")
+        if st.button("Login"):
+            if login_user(login_email, login_pass):
+                st.session_state.authenticated = True
+                st.session_state.user_email = login_email
+                st.success("Logged in successfully!")
+                st.experimental_rerun()
+            else:
+                st.error("Invalid credentials.")
+
+    with tab2:
+        signup_email = st.text_input("New Email", key="signup_email")
+        signup_pass = st.text_input("New Password", type="password", key="signup_pass")
+        if st.button("Sign Up"):
+            ok, msg = signup_user(signup_email, signup_pass)
+            if ok:
+                st.success(msg)
+            else:
+                st.error(msg)
+
+    st.stop()
+
+# ====================== Header ==============================
+
+st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>Bhojan Bazaar 🛒</h1>", unsafe_allow_html=True)
+st.markdown("### India’s Trusted Raw Material Marketplace for Street Food Vendors")
+
+# =================== Sidebar Menu ===========================
+
+st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3595/3595455.png", width=100)
+st.sidebar.title("📦 Menu")
+menu = st.sidebar.radio("Navigate", ["Home", "Search", "Departments", "Cart", "Wishlist", "Orders", "Logout"])
+
+# =================== Helper Functions =======================
+
+def add_to_list(pid, list_name):
+    users = load_users()
+    email = st.session_state.user_email
+    if pid not in users[email][list_name]:
+        users[email][list_name].append(pid)
+        save_users(users)
+        st.success(f"✅ Added to {list_name}!")
+
+def remove_from_list(pid, list_name):
+    users = load_users()
+    email = st.session_state.user_email
+    if pid in users[email][list_name]:
+        users[email][list_name].remove(pid)
+        save_users(users)
+
+# ====================== Pages ===============================
+
+users = load_users()
+user_data = users[st.session_state.user_email]
+
+if menu == "Home":
+    st.success("Welcome to Bhojan Bazaar. Browse fresh raw materials.")
+    st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
+
+elif menu == "Search":
+    query = st.text_input("🔍 Search products")
+    if query:
+        filtered = products[products['name'].str.contains(query, case=False)]
+        for _, row in filtered.iterrows():
+            st.markdown(f"**{row.name}** - ₹{row.price} | ⭐ {row.rating}")
+            c1, c2 = st.columns(2)
+            with c1:
+                st.button("Add to Cart", key=f"cart_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'cart'))
+            with c2:
+                st.button("💗 Wishlist", key=f"wish_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'wishlist'))
+
+elif menu == "Departments":
+    dept = st.selectbox("Select Category", products['category'].unique())
+    filtered = products[products['category'] == dept]
+    for _, row in filtered.iterrows():
+        final_price = row.price * (1 - row.discount / 100)
+        st.markdown(f"**{row.name}** | ₹{final_price:.2f} | ⭐ {row.rating} | 🏪 {row.supplier}")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.button("Add to Cart", key=f"dept_cart_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'cart'))
+        with c2:
+            st.button("💗 Wishlist", key=f"dept_wish_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'wishlist'))
+
+elif menu == "Cart":
+    st.subheader("🛍️ Your Cart")
+    total = 0
+    for pid in user_data['cart']:
+        item = products[products.product_id == pid].iloc[0]
+        price = item.price * (1 - item.discount / 100)
+        total += price
+        st.write(f"{item.name} - ₹{price:.2f}")
+    st.markdown(f"**Total: ₹{total:.2f}**")
+    if st.button("✅ Place Order"):
+        user_data['orders'].append({"items": user_data['cart'], "timestamp": datetime.utcnow().isoformat()})
+        user_data['cart'] = []
+        save_users(users)
+        st.success("🎉 Order Placed Successfully!")
+
+elif menu == "Wishlist":
+    st.subheader("💖 Your Wishlist")
+    for pid in user_data['wishlist']:
+        item = products[products.product_id == pid].iloc[0]
+        st.write(f"{item.name} - ₹{item.price}")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.button("🛒 Add to Cart", key=f"wish_cart_{pid}", on_click=add_to_list, args=(pid, 'cart'))
+        with c2:
+            st.button("❌ Remove", key=f"wish_remove_{pid}", on_click=remove_from_list, args=(pid, 'wishlist'))
+
+elif menu == "Orders":
+    st.subheader("📦 Your Orders")
+    for order in user_data['orders']:
+        st.markdown(f"📅 {order['timestamp']}")
+        st.write("🛒 Items:", order['items'])
+
+elif menu == "Logout":
+    st.session_state.authenticated = False
+    st.session_state.user_email = None
+    st.success("You have been logged out.")
+    st.experimental_rerun()
+
 
 
 
