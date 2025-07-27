@@ -1447,15 +1447,20 @@ elif st.session_state.menu == "Wishlist":
                     st.rerun()
 
 # Orders Page
+# Orders Page
 elif st.session_state.menu == "Orders":
     st.subheader("📦 Your Orders")
-    for order in st.session_state.orders:
+
+    # Reverse the order list to show latest orders first
+    for order in reversed(st.session_state.orders):
         st.markdown(f"### {order['name']}")
+        
         if order['status'] == "Delivered":
             st.success(f"✅ Delivered on {order['delivered_date']}")
         else:
             st.warning(f"🚚 Status: {order['status']}, Estimated Delivery: {order['estimated_date']}")
             st.progress(["Order Placed", "Shipped", "Out for Delivery", "Delivered"].index(order['status']) / 3.0)
+
         with st.expander("View Tracking Details"):
             steps = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]
             for step in steps:
@@ -1464,3 +1469,4 @@ elif st.session_state.menu == "Orders":
                 else:
                     st.markdown(f"🔲 {step}")
         st.markdown("---")
+
