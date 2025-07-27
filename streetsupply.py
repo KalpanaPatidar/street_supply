@@ -649,3 +649,25 @@ elif st.session_state.menu == "Wishlist":
             st.success("🛒 Moved to Cart!")
             st.rerun()
         if st.button("Remove", key=f"wish_remove_{pid}"):
+            st.session_state.wishlist.remove(pid)
+            st.success("❌ Removed from Wishlist!")
+            st.rerun()
+# Orders Page
+elif st.session_state.menu == "Orders":
+    st.subheader("📦 Your Orders")
+    for order in st.session_state.orders:
+        st.markdown(f"### {order['name']}")
+        if order['status'] == "Delivered":
+            st.success(f"✅ Delivered on {order['delivered_date']}")
+        else:
+            st.warning(f"🚚 Status: {order['status']}, Estimated Delivery: {order['estimated_date']}")
+            st.progress(["Order Placed", "Shipped", "Out for Delivery", "Delivered"].index(order['status']) / 3.0)
+        with st.expander("View Tracking Details"):
+            steps = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]
+            for step in steps:
+                if steps.index(step) <= steps.index(order['status']):
+                    st.markdown(f"✅ {step}")
+                else:
+                    st.markdown(f"🔲 {step}")
+        st.markdown("---")
+
