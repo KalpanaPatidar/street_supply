@@ -3,37 +3,19 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
-# --- Static Banner Image ---
+# Static Banner Image (no caption)
 st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
-# --- Stylish Heading & Subheading ---
+# Bold, centered heading using HTML
 st.markdown("""
-    <h1 style='
-        text-align: center;
-        font-weight: 700;
-        color: #2c3e50;
-        font-size: 40px;
-        margin-top: 20px;
-        margin-bottom: 0px;
-        font-family: "Segoe UI", "Roboto", sans-serif;
-    '>
-        Welcome to Bhojan Bazaar
-    </h1>
-    <h3 style='
-        text-align: center;
-        color: #7f8c8d;
-        font-size: 20px;
-        font-weight: 400;
-        margin-bottom: 30px;
-    '>
-        Your Trusted Raw Material Marketplace
-    </h3>
+<h1 style='text-align: center; font-weight: bold; color: #333333; font-size: 32px; margin-top: 10px;'>
+    Welcome to Bhojan Bazaar - Your Trusted Raw Material Marketplace
+</h1>
 """, unsafe_allow_html=True)
 
-# --- Session State Setup ---
+# Session Setup
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
 if 'menu' not in st.session_state: st.session_state.menu = "Home"
@@ -43,79 +25,48 @@ if 'orders' not in st.session_state:
         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
     ]
-if 'back_to_home' not in st.session_state: st.session_state.back_to_home = False
-if 'selected_category' not in st.session_state: st.session_state.selected_category = None
-if 'search_query' not in st.session_state: st.session_state.search_query = ""
+if 'back_to_home' not in st.session_state:
+    st.session_state.back_to_home = False
+if 'selected_category' not in st.session_state:
+    st.session_state.selected_category = None
 
-# --- Load Product Data ---
+# Load Data
 products = pd.read_csv("india_products_with_locations.csv")
 
-# --- Custom Header: Home | Search Bar | Account ---
+# Header Bar
+header_cols = st.columns([1, 7, 1, 1, 1, 1])
+with header_cols[0]:
+    if st.button("🏠", help="Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+with header_cols[4]:
+    if st.button("👤 Account"):
+        st.session_state.menu = "Account"
+
+# Centered Search
 st.markdown("""
     <style>
-        .custom-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: -10px;
-            margin-bottom: 10px;
-        }
-        .home-icon {
-            font-size: 28px;
-            margin-left: 10px;
-            background: none;
-            border: none;
-        }
-        .search-box {
-            flex-grow: 1;
-            text-align: center;
-        }
-        .search-box input {
-            width: 60%;
-            padding: 8px;
-            font-size: 16px;
-        }
-        .account-button {
-            font-size: 16px;
-            margin-right: 15px;
-            background: none;
-            border: none;
-        }
+    .search-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .search-bar input {
+        width: 50% !important;
+    }
     </style>
-
-    <div class="custom-header">
-        <form method="post">
-            <button name="home_click" class="home-icon">🏠</button>
-        </form>
-        <div class="search-box">
-            <form method="post">
-                <input name="search_query" placeholder="Search 9000+ products" />
-            </form>
-        </div>
-        <form method="post">
-            <button name="account_click" class="account-button">👤 Account</button>
-        </form>
-    </div>
 """, unsafe_allow_html=True)
 
-# --- Handle Form Submissions ---
-if "home_click" in st.session_state:
-    st.session_state.menu = "Home"
-    st.session_state.selected_category = None
-    st.rerun()
-if "account_click" in st.session_state:
-    st.session_state.menu = "Account"
-if "search_query" in st.session_state:
-    st.session_state.search_query = st.session_state["search_query"]
+st.markdown('<div class="search-bar">', unsafe_allow_html=True)
+search = st.text_input("", placeholder="Search 9000+ products")
+st.markdown('</div>', unsafe_allow_html=True)
 
-search = st.session_state.search_query
-
-# --- Nearest Location Toggle (only if search) ---
+# Nearest Toggle Only for Search
 if search:
     st.markdown("<div style='text-align:right;'>", unsafe_allow_html=True)
     st.toggle("📍 Nearest Location", key="location_filter")
     st.markdown("</div>", unsafe_allow_html=True)
-
 # --- Navigation Buttons ---
 cols = st.columns([8, 1, 1, 1])
 with cols[1]:
