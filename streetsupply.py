@@ -4,7 +4,10 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 # st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
+# Static Banner Image (no caption)
+st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
 # Stylish Heading & Subheading
 st.markdown("""
@@ -29,6 +32,17 @@ st.markdown("""
         Your Trusted Raw Material Marketplace
     </h3>
 """, unsafe_allow_html=True)
+
+# Styling for search box
+st.markdown("""
+    <style>
+    .stTextInput input {
+        font-size: 16px;
+        padding: 8px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Session Setup
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
@@ -39,72 +53,49 @@ if 'orders' not in st.session_state:
         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
     ]
-if 'back_to_home' not in st.session_state:
-    st.session_state.back_to_home = False
-if 'selected_category' not in st.session_state:
-    st.session_state.selected_category = None
+if 'back_to_home' not in st.session_state: st.session_state.back_to_home = False
+if 'selected_category' not in st.session_state: st.session_state.selected_category = None
 
 # Load Data
 products = pd.read_csv("india_products_with_locations.csv")
 
-# Header Bar
-# header_cols = st.columns([1, 7, 1, 1, 1, 1])
-# with header_cols[0]:
-#     if st.button("🏠", help="Home"):
-#         st.session_state.menu = "Home"
-#         st.session_state.selected_category = None
-#         st.rerun()
-# with header_cols[4]:
-#     if st.button("👤 Account"):
-#         st.session_state.menu = "Account"
+# Header Row: Home | Search | Account
+col_home, col_search, col_account = st.columns([1, 6, 1])
 
-# Centered Search
-# st.markdown("""
-#     <style>
-#     .search-bar {
-#         display: flex;
-#         justify-content: center;
-#         # margin-bottom: 20px;
-#     }
-#     .search-bar input {
-#         width: 50% !important;
-#     }
-#     </style>
-""", unsafe_allow_html=True)
-
-
-# ---------- 📌 Top Bar Layout ----------
-top_col1, top_col2, top_col3 = st.columns([1, 5, 1.2])
-
-with top_col1:
-    if st.button("🏠 Home"):
+with col_home:
+    if st.button("🏠", help="Home"):
         st.session_state.menu = "Home"
         st.session_state.selected_category = None
         st.rerun()
 
-# with top_col2:
-#     search_query = st.text_input("Search products...", "", key="search_input", label_visibility="collapsed")
+with col_search:
+    search = st.text_input("Search 9000+ products", key="search_query")
 
-   # with top_col3:
+with col_account:
     if st.button("👤 Account"):
         st.session_state.menu = "Account"
 
+# Functional buttons for 🏠 and 👤
+col1, col2, col3 = st.columns([1, 8, 1])
+with col1:
+    if st.button("🏠", key="home_actual"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+with col3:
+    if st.button("👤 Account", key="account_actual"):
+        st.session_state.menu = "Account"
 
+# Capture the search query
+search = st.text_input("", placeholder="Search 9000+ products", key="search_real")
 
-# ---- Load Product Data ----
-products = pd.read_csv("india_products_with_locations.csv")
-
-
-st.markdown('<div class="search-bar">', unsafe_allow_html=True)
-search = st.text_input("", placeholder="Search 9000+ products")
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Nearest Toggle Only for Search
+# Nearest Location Toggle (only if something is searched)
 if search:
     st.markdown("<div style='text-align:right;'>", unsafe_allow_html=True)
     st.toggle("📍 Nearest Location", key="location_filter")
     st.markdown("</div>", unsafe_allow_html=True)
-# --- Navigation Buttons ---
+
+# Navigation Buttons
 cols = st.columns([8, 1, 1, 1])
 with cols[1]:
     if st.button("🛒", help="Cart"): st.session_state.menu = "Cart"
@@ -113,10 +104,7 @@ with cols[2]:
 with cols[3]:
     if st.button("📦", help="Orders"): st.session_state.menu = "Orders"
 
-
-
-
-# --- Helper Functions ---
+# Helper function
 def add_to_cart(pid):
     if pid not in st.session_state.cart:
         st.session_state.cart.append(pid)
@@ -127,7 +115,7 @@ def add_to_wishlist(pid):
         st.session_state.wishlist.append(pid)
         st.success("💗 Product added to wishlist!")
 
-# --- Account Page ---
+# Account Page
 if st.session_state.menu == "Account":
     st.subheader("👤 Your Profile")
     if st.button("✏️ Edit Profile"):
@@ -137,10 +125,11 @@ if st.session_state.menu == "Account":
     phone = st.text_input("Phone", value="9876543210", disabled=not edit)
     email = st.text_input("Email", value="kishan@example.com", disabled=not edit)
     address = st.text_area("Address", value="Indore", disabled=not edit)
-    if edit: st.button("Save Changes")
+    if edit:
+        st.button("Save Changes")
     st.button("🚪 Logout")
 
-# --- Search Results Page ---
+# Search Results Page (dynamic)
 if search:
     st.subheader(f"🔍 Search Results for '{search}'")
     if st.session_state.get("location_filter"):
@@ -155,11 +144,177 @@ if search:
     if results.empty:
         st.info("No products found matching the search criteria.")
     for _, row in results.iterrows():
-st.markdown(f"""
-**{row['name']}** from *{row['supplier']}*  
-Price: ₹{row['price']} | Discounted: Rs{row['price'] * (1 - row['discount'] / 100):.2f}  
-Rating: {row['rating']} | Location: {row['supplier_location']} | Delivery: ₹{row['delivery_charge']}
-""")
+        st.markdown(f"""
+        *{row['name']}* from *{row['supplier']}*  
+        Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
+        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
+        """)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Add to Cart", key=f"cart_{row['product_id']}"):
+                add_to_cart(row['product_id'])
+        with col2:
+            if st.button("💗 Wishlist", key=f"wish_{row['product_id']}"):
+                add_to_wishlist(row['product_id'])
+        with col3:
+            st.button("Order Now", key=f"order_{row['product_id']}")
+        st.markdown("---")
+
+
+# # Stylish Heading & Subheading
+# st.markdown("""
+#     <h1 style='
+#         text-align: center;
+#         font-weight: 700;
+#         color: #2c3e50;
+#         font-size: 40px;
+#         margin-top: 20px;
+#         margin-bottom: 0px;
+#         font-family: "Segoe UI", "Roboto", sans-serif;
+#     '>
+#         Welcome to Bhojan Bazaar
+#     </h1>
+#     <h3 style='
+#         text-align: center;
+#         color: #7f8c8d;
+#         font-size: 20px;
+#         font-weight: 400;
+#         margin-bottom: 30px;
+#     '>
+#         Your Trusted Raw Material Marketplace
+#     </h3>
+# """, unsafe_allow_html=True)
+# # Session Setup
+# if 'cart' not in st.session_state: st.session_state.cart = []
+# if 'wishlist' not in st.session_state: st.session_state.wishlist = []
+# if 'menu' not in st.session_state: st.session_state.menu = "Home"
+# if 'orders' not in st.session_state:
+#     st.session_state.orders = [
+#         {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
+#         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
+#         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
+#     ]
+# if 'back_to_home' not in st.session_state:
+#     st.session_state.back_to_home = False
+# if 'selected_category' not in st.session_state:
+#     st.session_state.selected_category = None
+
+# # Load Data
+# products = pd.read_csv("india_products_with_locations.csv")
+
+# # Header Bar
+# # header_cols = st.columns([1, 7, 1, 1, 1, 1])
+# # with header_cols[0]:
+# #     if st.button("🏠", help="Home"):
+# #         st.session_state.menu = "Home"
+# #         st.session_state.selected_category = None
+# #         st.rerun()
+# # with header_cols[4]:
+# #     if st.button("👤 Account"):
+# #         st.session_state.menu = "Account"
+
+# # Centered Search
+# # st.markdown("""
+# #     <style>
+# #     .search-bar {
+# #         display: flex;
+# #         justify-content: center;
+# #         # margin-bottom: 20px;
+# #     }
+# #     .search-bar input {
+# #         width: 50% !important;
+# #     }
+# #     </style>
+# """, unsafe_allow_html=True)
+
+
+# # ---------- 📌 Top Bar Layout ----------
+# top_col1, top_col2, top_col3 = st.columns([1, 5, 1.2])
+
+# with top_col1:
+#     if st.button("🏠 Home"):
+#         st.session_state.menu = "Home"
+#         st.session_state.selected_category = None
+#         st.rerun()
+
+# # with top_col2:
+# #     search_query = st.text_input("Search products...", "", key="search_input", label_visibility="collapsed")
+
+#    # with top_col3:
+#     if st.button("👤 Account"):
+#         st.session_state.menu = "Account"
+
+
+
+# # ---- Load Product Data ----
+# products = pd.read_csv("india_products_with_locations.csv")
+
+
+# st.markdown('<div class="search-bar">', unsafe_allow_html=True)
+# search = st.text_input("", placeholder="Search 9000+ products")
+# st.markdown('</div>', unsafe_allow_html=True)
+
+# # Nearest Toggle Only for Search
+# if search:
+#     st.markdown("<div style='text-align:right;'>", unsafe_allow_html=True)
+#     st.toggle("📍 Nearest Location", key="location_filter")
+#     st.markdown("</div>", unsafe_allow_html=True)
+# # --- Navigation Buttons ---
+# cols = st.columns([8, 1, 1, 1])
+# with cols[1]:
+#     if st.button("🛒", help="Cart"): st.session_state.menu = "Cart"
+# with cols[2]:
+#     if st.button("💗", help="Wishlist"): st.session_state.menu = "Wishlist"
+# with cols[3]:
+#     if st.button("📦", help="Orders"): st.session_state.menu = "Orders"
+
+
+
+
+# # --- Helper Functions ---
+# def add_to_cart(pid):
+#     if pid not in st.session_state.cart:
+#         st.session_state.cart.append(pid)
+#         st.success("✅ Product added to cart!")
+
+# def add_to_wishlist(pid):
+#     if pid not in st.session_state.wishlist:
+#         st.session_state.wishlist.append(pid)
+#         st.success("💗 Product added to wishlist!")
+
+# # --- Account Page ---
+# if st.session_state.menu == "Account":
+#     st.subheader("👤 Your Profile")
+#     if st.button("✏️ Edit Profile"):
+#         st.session_state.edit_mode = not st.session_state.get("edit_mode", False)
+#     edit = st.session_state.get("edit_mode", False)
+#     name = st.text_input("Full Name", value="Kishan Vendor", disabled=not edit)
+#     phone = st.text_input("Phone", value="9876543210", disabled=not edit)
+#     email = st.text_input("Email", value="kishan@example.com", disabled=not edit)
+#     address = st.text_area("Address", value="Indore", disabled=not edit)
+#     if edit: st.button("Save Changes")
+#     st.button("🚪 Logout")
+
+# # --- Search Results Page ---
+# if search:
+#     st.subheader(f"🔍 Search Results for '{search}'")
+#     if st.session_state.get("location_filter"):
+#         st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: True</div>", unsafe_allow_html=True)
+#     if st.button("🔙 Back to Home"):
+#         st.session_state.menu = "Home"
+#         st.session_state.selected_category = None
+#         st.rerun()
+#     results = products[products['name'].str.contains(search, case=False)]
+#     if st.session_state.get("location_filter"):
+#         results = results[results['supplier_location'].str.contains("Indore", case=False)]
+#     if results.empty:
+#         st.info("No products found matching the search criteria.")
+#     for _, row in results.iterrows():
+# st.markdown(f"""
+# **{row['name']}** from *{row['supplier']}*  
+# Price: ₹{row['price']} | Discounted: Rs{row['price'] * (1 - row['discount'] / 100):.2f}  
+# Rating: {row['rating']} | Location: {row['supplier_location']} | Delivery: ₹{row['delivery_charge']}
+# """)
 
         col1, col2, col3 = st.columns(3)
         with col1:
