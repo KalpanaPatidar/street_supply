@@ -574,7 +574,7 @@ elif st.session_state.menu == "Home":
     st.subheader("🛒 Categories")
     categories = products['category'].unique()
     image_map = {
-        # "Edible Oil": "https://www.jiomart.com/images/product/original/490000052/fortune-sunlite-refined-sunflower-oil-870-g-product-images-o490000052-p490000052-0-202504081953.jpg?im=Resize=(360,360)",
+         "Edible Oil": "https://www.jiomart.com/images/product/original/490000052/fortune-sunlite-refined-sunflower-oil-870-g-product-images-o490000052-p490000052-0-202504081953.jpg?im=Resize=(360,360)",
         "Grains": "https://cdn-icons-png.flaticon.com/512/1704/1704780.png",
         "Spices": "https://cdn-icons-png.flaticon.com/512/1999/1999625.png",
         "Cleaning Supplies": "https://cdn-icons-png.flaticon.com/512/679/679922.png",
