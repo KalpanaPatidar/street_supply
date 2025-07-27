@@ -34,6 +34,16 @@ st.markdown("""
     </h3>
 """, unsafe_allow_html=True)
 
+# Styling for search box
+st.markdown("""
+    <style>
+    .stTextInput input {
+        font-size: 16px;
+        padding: 8px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Session Setup
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
@@ -50,50 +60,21 @@ if 'selected_category' not in st.session_state: st.session_state.selected_catego
 # Load Data
 products = pd.read_csv("india_products_with_locations.csv")
 
-# Header Row: Home, Search Bar, Account
-st.markdown("""
-    <style>
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: -10px;
-            margin-bottom: 20px;
-        }
-        .search-container {
-            flex-grow: 1;
-            text-align: center;
-        }
-        .search-box input {
-            width: 50% !important;
-            padding: 8px;
-            font-size: 16px;
-        }
-        .account-btn {
-            font-size: 18px;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-    <div class="top-bar">
-        <div>
-            <form action="" method="post">
-                <button name="home" style="font-size: 24px; border: none; background: none;">🏠</button>
-            </form>
-        </div>
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchBox" placeholder="Search 9000+ products" />
-            </div>
-        </div>
-        <div>
-            <form action="" method="post">
-                <button name="account" class="account-btn">👤 Account</button>
-            </form>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+# Header Row: Home | Search | Account
+col_home, col_search, col_account = st.columns([1, 6, 1])
+
+with col_home:
+    if st.button("🏠", help="Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+
+with col_search:
+    search = st.text_input("Search 9000+ products", key="search_query")
+
+with col_account:
+    if st.button("👤 Account"):
+        st.session_state.menu = "Account"
 
 # Functional buttons for 🏠 and 👤
 col1, col2, col3 = st.columns([1, 8, 1])
