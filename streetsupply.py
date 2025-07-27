@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
 # --- Load Data ---
-products = pd.read_csv("products.csv")
+products = pd.read_csv("india_products_with_locations.csv")
 
 # --- Session State Setup ---
 if 'cart' not in st.session_state: st.session_state.cart = []
