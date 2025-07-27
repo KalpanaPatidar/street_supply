@@ -193,29 +193,23 @@
 #                     st.markdown(f"🔲 {step}")
 #         st.markdown("---")
 
-138 lines
-
-# Cart Page
-elif st.session_state.menu == "Cart":
-    st.subheader("🛍 Your Cart")
-    total = 0
-    for pid in st.session_state.cart:
-        # Here you would fetch product details based on pid
-        # For demonstration, we will just show a placeholder
-        st.write(f"Product ID: {pid}")
-        total += 100  # Placeholder for product price
-    st.markdown(f"### Total Payable: ₹{total:.2f}")
-    if st.button("✅ Place Order"):
-        st.success("Order Placed!")
-        st.session_state.cart = []
-# Wishlist Page
-elif st.session_state.menu == "Wishlist":
-    st.subheader("💖 Wishlist")
-    for pid in st.session_state.wishlist:
-        # Here you would fetch product details based on pid
-        st.write(f"Product ID: {pid}")
-# Orders Page
-elif st.session_state.menu == "Orders":
-    st.subheader("📦 Your Orders")
-    for order in st.session_state.orders:
-        st.markdown(f"### Order: {order['name']}, Amount: ₹{order['amount']}, Status: {order['status']}")
+import streamlit as st
+import requests
+# Function to fetch raw materials from an API (example API)
+def fetch_raw_materials(query):
+    # Replace with a real API endpoint
+    api_url = f"https://api.example.com/raw-materials?search={query}"
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return []
+# Streamlit UI
+st.title("Street Food Vendor Supply App")
+st.markdown("<h2 style='color: blue;'>Order Raw Materials</h2>", unsafe_allow_html=True)
+# Delivery or Pickup Option
+order_type = st.selectbox("Select Order Type", ["Delivery", "Pickup"])
+if order_type == "Delivery":
+    st.write("You have selected Delivery.")
+    # Here you can integrate Google Maps API for delivery tracking
+    # Example: st.map(data) for displaying a map
