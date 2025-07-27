@@ -215,6 +215,7 @@
 #     # Example: st.map(data) for displaying a map
 
 # Updated Streamlit UI Design for Bhojan Bazaar (Inspired by CHF Mart)
+# Updated Streamlit UI Design for Bhojan Bazaar (Inspired by CHF Mart)
 
 import streamlit as st
 import pandas as pd
@@ -312,8 +313,7 @@ if search:
         st.markdown(f"""
         **{row['name']}** from **{row['supplier']}**  
         Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
-        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}  
-        💬 {row['reviews']}
+        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
         """)
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -353,7 +353,7 @@ elif st.session_state.menu == "Home":
         cat_items = products[products['category'] == cat]
         for _, row in cat_items.iterrows():
             st.markdown(f"**{row['name']}** (₹{row['price']} → ₹{row['price']*(1-row['discount']/100):.2f})")
-            st.markdown(f"⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}  \n💬 {row['reviews']}")
+            st.markdown(f"⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}")
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.button("Add to Cart", key=f"dept_cart_{row['product_id']}")
@@ -407,4 +407,3 @@ elif st.session_state.menu == "Orders":
                 else:
                     st.markdown(f"🔲 {step}")
         st.markdown("---")
-
