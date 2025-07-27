@@ -231,7 +231,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit.components.v1 import html
-from streamlit_lottie import st_lottie
+# from streamlit_lottie import st_lottie
 import razorpay
 import json
 
@@ -241,9 +241,9 @@ st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 # Load data
 products = pd.read_csv("products.csv")
 
-# Load Lottie animation
-with open("lottie/animation.json") as f:
-    lottie_anim = json.load(f)
+# # Load Lottie animation
+# with open("lottie/animation.json") as f:
+#     lottie_anim = json.load(f)
 
 # Razorpay keys (replace with your test keys)
 client = razorpay.Client(auth=("rzp_test_xxxxxx", "xxxxxxxxxxxxx"))
