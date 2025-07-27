@@ -103,49 +103,55 @@ if st.session_state.menu == "Account":
 # --- Search Results Page ---
 if search:
     st.subheader(f"🔍 Search Results for '{search}'")
+    
     if st.session_state.get("location_filter"):
         st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: True</div>", unsafe_allow_html=True)
+
     if st.button("🔙 Back to Home"):
         st.session_state.menu = "Home"
         st.session_state.selected_category = None
         st.rerun()
+
     results = products[products['name'].str.contains(search, case=False)]
+
     if st.session_state.get("location_filter"):
         results = results[results['supplier_location'].str.contains("Indore", case=False)]
+
     if results.empty:
         st.info("No products found matching the search criteria.")
-     for _, row in results.iterrows():
-       with st.form(key=f"form_{row['product_id']}"):
-        st.markdown(f"""
-        **{row['name']}** from **{row['supplier']}**  
-        Price: ₹{row['price']} | Discounted: ₹{row['price']*(1 - row['discount']/100):.2f}  
-        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
-        """)
-        
-        col1, col2, col3 = st.columns(3)
+    else:
+        for _, row in results.iterrows():
+            with st.form(key=f"form_{row['product_id']}"):
+                st.markdown(f"""
+                **{row['name']}** from **{row['supplier']}**  
+                Price: ₹{row['price']} | Discounted: ₹{row['price']*(1 - row['discount']/100):.2f}  
+                ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
+                """)
 
-        with col1:
-            add = st.form_submit_button("Add to Cart")
-        with col2:
-            wish = st.form_submit_button("💗 Wishlist")
-        with col3:
-            order = st.form_submit_button("Order Now")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    add = st.form_submit_button("Add to Cart")
+                with col2:
+                    wish = st.form_submit_button("💗 Wishlist")
+                with col3:
+                    order = st.form_submit_button("Order Now")
 
-        if add:
-            add_to_cart(row['product_id'])
-        elif wish:
-            add_to_wishlist(row['product_id'])
-        elif order:
-            today = datetime.now()
-            st.session_state.orders.append({
-                "product_id": row["product_id"],
-                "name": row["name"],
-                "status": "Order Placed",
-                "estimated_date": (today + timedelta(days=3)).strftime('%Y-%m-%d')
-            })
-            st.success("🎉 Order Placed Successfully!")
+                if add:
+                    add_to_cart(row['product_id'])
+                elif wish:
+                    add_to_wishlist(row['product_id'])
+                elif order:
+                    today = datetime.now()
+                    st.session_state.orders.append({
+                        "product_id": row["product_id"],
+                        "name": row["name"],
+                        "status": "Order Placed",
+                        "estimated_date": (today + timedelta(days=3)).strftime('%Y-%m-%d')
+                    })
+                    st.success("🎉 Order Placed Successfully!")
 
-    st.markdown("---")
+                st.markdown("---")
+
 
 
 
