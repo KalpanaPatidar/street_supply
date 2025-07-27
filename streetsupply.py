@@ -198,26 +198,81 @@ elif st.session_state.menu == "Category" and st.session_state.get("selected_cate
 # Cart Page
 elif st.session_state.menu == "Cart":
     st.subheader("🛍 Your Cart")
-    total = 0
-    for pid in st.session_state.cart:
-        item = products[products['product_id'] == pid].iloc[0]
-        price = item['price'] * (1 - item['discount'] / 100)
-        st.write(f"{item['name']} - ₹{price:.2f}")
-        if st.button("❌ Remove", key=f"remove_{pid}"):
-            st.session_state.cart.remove(pid)
-            st.success("🗑️ Removed from cart!")
-            st.rerun()
-        if st.button("💗 Save for Later", key=f"save_{pid}"):
-            if pid not in st.session_state.wishlist:
-                st.session_state.wishlist.append(pid)
-            st.session_state.cart.remove(pid)
-            st.success("💗 Moved to Wishlist!")
-            st.rerun()
-    st.markdown(f"### Total Payable: ₹{total:.2f}")
-    st.radio("Payment Mode", ["Cash on Delivery"], key="pay_mode")
-    if st.button("✅ Place Order"):
-        st.success("Order Placed with Cash on Delivery!")
-        st.session_state.cart = []
+
+    if not st.session_state.cart:
+        st.info("Your cart is empty.")
+    else:
+        total_mrp = 0
+        total_discount = 0
+        delivery_charge_total = 0
+
+        for pid in st.session_state.cart:
+            item = products[products['product_id'] == pid].iloc[0]
+
+            # Extract all required fields
+            name = item['name']
+            mrp = item['price']
+            discount_percent = item['discount']
+            discount_amount = mrp * (discount_percent / 100)
+            final_price = mrp - discount_amount
+            delivery_charge = item['delivery_charge']
+            supplier = item['supplier']
+            rating = item['rating']
+            stock = item['stock']
+
+            if stock <= 0:
+                st.warning(f"⚠️ {name} is currently out of stock.")
+                continue
+
+            # Totals
+            total_mrp += mrp
+            total_discount += discount_amount
+            delivery_charge_total += delivery_charge
+
+            # Product display
+            st.markdown(f"""
+            ### 🛒 {name}
+            - 🏷 **Supplier**: {supplier}
+            - ⭐ **Rating**: {rating}/5
+            - 📦 **Stock Available**: {stock}
+            - 💰 **MRP**: ₹{mrp:.2f}
+            - 🎯 **Discount ({discount_percent}%):** ₹{discount_amount:.2f}
+            - 🔖 **Price After Discount**: ₹{final_price:.2f}
+            - 🚚 **Delivery Charge**: ₹{delivery_charge:.2f}
+            """)
+
+            # Remove / Wishlist options
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("❌ Remove", key=f"remove_{pid}"):
+                    st.session_state.cart.remove(pid)
+                    st.success("🗑️ Removed from cart!")
+                    st.rerun()
+            with col2:
+                if st.button("💗 Save for Later", key=f"save_{pid}"):
+                    if pid not in st.session_state.wishlist:
+                        st.session_state.wishlist.append(pid)
+                    st.session_state.cart.remove(pid)
+                    st.success("💗 Moved to Wishlist!")
+                    st.rerun()
+
+            st.markdown("---")
+
+        # Final total payable
+        final_total = total_mrp - total_discount + delivery_charge_total
+
+        # Order Summary
+        st.markdown("## 🧾 Order Summary")
+        st.markdown(f"- **Total MRP:** ₹{total_mrp:.2f}")
+        st.markdown(f"- **Total Discount:** ₹{total_discount:.2f}")
+        st.markdown(f"- **Delivery Charges:** ₹{delivery_charge_total:.2f}")
+        st.markdown(f"### ✅ Total Payable: ₹{final_total:.2f}")
+
+        st.radio("Payment Mode", ["Cash on Delivery"], key="pay_mode")
+
+        if st.button("✅ Place Order"):
+            st.success("🎉 Order Placed with Cash on Delivery!")
+            st.session_state.cart = []
 
 # Wishlist Page
 elif st.session_state.menu == "Wishlist":
