@@ -59,21 +59,21 @@ if 'selected_category' not in st.session_state: st.session_state.selected_catego
 # Load Data
 products = pd.read_csv("india_products_with_locations.csv")
 
-# Header Row: Home | Search | Account
-col_home, col_search, col_account = st.columns([1, 6, 1])
+# # Header Row: Home | Search | Account
+# col_home, col_search, col_account = st.columns([1, 6, 1])
 
-with col_home:
-    if st.button("🏠", help="Home"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
+# with col_home:
+#     if st.button("🏠", help="Home"):
+#         st.session_state.menu = "Home"
+#         st.session_state.selected_category = None
+#         st.rerun()
 
-with col_search:
-    search = st.text_input("Search 9000+ products", key="search_query")
+# with col_search:
+#     search = st.text_input("Search 9000+ products", key="search_query")
 
-with col_account:
-    if st.button("👤 Account"):
-        st.session_state.menu = "Account"
+# with col_account:
+#     if st.button("👤 Account"):
+#         st.session_state.menu = "Account"
 
 # Functional buttons for 🏠 and 👤
 col1, col2, col3 = st.columns([1, 8, 1])
