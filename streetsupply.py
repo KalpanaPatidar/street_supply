@@ -277,7 +277,7 @@ else:
             st.markdown("---")
 
 # ------------------------ CART PAGE ------------------------
-elif st.session_state.menu == "Cart":
+if st.session_state.menu == "Cart":
     st.subheader("🛍 Your Cart")
     total = 0
     for pid in st.session_state.cart:
