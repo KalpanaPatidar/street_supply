@@ -101,10 +101,9 @@ if st.session_state.menu == "Account":
     st.button("🚪 Logout")
 
 # --- Search Results Page ---
-# Show search results only when menu is Home
-if search and st.session_state.menu == "Home":
+if search:
     st.subheader(f"🔍 Search Results for '{search}'")
-
+    
     if st.session_state.get("location_filter"):
         st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: True</div>", unsafe_allow_html=True)
 
@@ -124,8 +123,8 @@ if search and st.session_state.menu == "Home":
         for _, row in results.iterrows():
             with st.form(key=f"form_{row['product_id']}"):
                 st.markdown(f"""
-                **{row['name']}** from **{row['supplier']}**  
-                Price: ₹{row['price']} | Discounted: ₹{row['price'] * (1 - row['discount'] / 100):.2f}  
+                *{row['name']}* from *{row['supplier']}*  
+                Price: ₹{row['price']} | Discounted: ₹{row['price']*(1 - row['discount']/100):.2f}  
                 ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
                 """)
 
@@ -152,6 +151,9 @@ if search and st.session_state.menu == "Home":
                     st.success("🎉 Order Placed Successfully!")
 
                 st.markdown("---")
+
+
+
 
 # Home Page - Categories with Grid
 elif st.session_state.menu == "Home":
