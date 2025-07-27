@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
 # Static Banner Image (no caption)
-st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
+# st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
 # Stylish Heading & Subheading
 st.markdown("""
@@ -66,7 +66,7 @@ st.markdown("""
     .search-bar {
         display: flex;
         justify-content: center;
-        margin-bottom: 20px;
+        # margin-bottom: 20px;
     }
     .search-bar input {
         width: 50% !important;
