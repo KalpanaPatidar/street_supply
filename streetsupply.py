@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
 # Static Banner Image (no caption)
-st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
+# st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
 # Stylish Heading & Subheading
 st.markdown("""
@@ -27,7 +27,42 @@ st.markdown("""
         font-size: 20px;
         font-weight: 400;
         margin-bottom: 30px;
-    '>
+    '
+      .custom-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 8px 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .cart-button {
+        background-color: #2196F3;
+    }
+    .cart-button:hover {
+        background-color: #0b7dda;
+    }
+
+    .wishlist-button {
+        background-color: #f44336;
+    }
+    .wishlist-button:hover {
+        background-color: #da190b;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }>
         Your Trusted Raw Material Marketplace
     </h3>
 """, unsafe_allow_html=True)
