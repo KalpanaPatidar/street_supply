@@ -5,10 +5,8 @@ import pandas as pd
 from datetime import datetime, timedelta
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
-Static Banner Image (no caption)
-st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
-Stylish Heading & Subheading
+# Stylish Heading & Subheading
 st.markdown("""
     <h1 style='
         text-align: center;
