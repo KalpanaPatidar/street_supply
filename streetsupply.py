@@ -254,52 +254,6 @@ elif st.session_state.menu == "Orders":
                     st.markdown(f"🔲 {step}")
         st.markdown("---")
 
-st.markdown("""
-<style>
-/* Custom button style */
-.custom-button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 8px 0px;
-    font-size: 16px;
-    font-weight: 600;
-    text-align: center;
-    color: white;
-    background-color: #4CAF50;
-    border: none;
-    border-radius: 10px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-    text-decoration: none;
-}
-.custom-button:hover {
-    background-color: #45a049;
-}
-
-/* Disabled button */
-.custom-button.disabled {
-    background-color: #ccc;
-    color: #666;
-    cursor: not-allowed;
-}
-
-/* Wishlist button */
-.wishlist-button {
-    background-color: #f44336;
-}
-.wishlist-button:hover {
-    background-color: #da190b;
-}
-
-/* Cart button */
-.cart-button {
-    background-color: #2196F3;
-}
-.cart-button:hover {
-    background-color: #0b7dda;
-}
-</style>
-""", unsafe_allow_html=True)
 
 # import streamlit as st
 # import pandas as pd
