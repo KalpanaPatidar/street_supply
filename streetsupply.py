@@ -8,13 +8,29 @@ st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 # Static Banner Image (no caption)
 st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
-# Bold, centered heading using HTML
+# Stylish Heading & Subheading
 st.markdown("""
-<h1 style='text-align: center; font-weight: bold; color: #333333; font-size: 32px; margin-top: 10px;'>
-    Welcome to Bhojan Bazaar - Your Trusted Raw Material Marketplace
-</h1>
+    <h1 style='
+        text-align: center;
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 40px;
+        margin-top: 20px;
+        margin-bottom: 0px;
+        font-family: "Segoe UI", "Roboto", sans-serif;
+    '>
+        Welcome to Bhojan Bazaar
+    </h1>
+    <h3 style='
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 20px;
+        font-weight: 400;
+        margin-bottom: 30px;
+    '>
+        Your Trusted Raw Material Marketplace
+    </h3>
 """, unsafe_allow_html=True)
-
 # Session Setup
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
