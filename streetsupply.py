@@ -241,6 +241,8 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import json
+import os
 
 # ========================== CONFIG ==========================
 
@@ -339,9 +341,7 @@ elif menu == "Wishlist":
 
 elif menu == "Orders":
     st.subheader("📦 Your Orders")
-  from datetime import datetime
-import json
-import os
+
 
 # ========================== CONFIG ==========================
 
