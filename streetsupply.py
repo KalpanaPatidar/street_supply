@@ -415,7 +415,8 @@ if search:
         **{row['name']}** from **{row['supplier']}**  
         Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
         ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}  
-        💬 {row['reviews']}
+        💬 {row['reviews'] if 'reviews' in row and pd.notna(row['reviews']) else 'No reviews available'}
+
         """)
         col1, col2, col3 = st.columns(3)
         with col1:
