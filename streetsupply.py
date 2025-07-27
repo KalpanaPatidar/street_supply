@@ -252,7 +252,91 @@ elif st.session_state.menu == "Orders":
                     st.markdown(f"✅ {step}")
                 else:
                     st.markdown(f"🔲 {step}")
-        st.markdown("---")
+        # st.markdown("---")
+
+
+
+# ---------- CSS Styling ----------
+st.markdown("""
+    <style>
+    .custom-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 8px 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .cart-button {
+        background-color: #2196F3;
+    }
+    .cart-button:hover {
+        background-color: #0b7dda;
+    }
+
+    .wishlist-button {
+        background-color: #f44336;
+    }
+    .wishlist-button:hover {
+        background-color: #da190b;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ---------- Session State ----------
+if "cart" not in st.session_state:
+    st.session_state.cart = []
+
+if "wishlist" not in st.session_state:
+    st.session_state.wishlist = []
+
+# ---------- Product Info ----------
+product_name = "Cool Sneakers"
+product_price = 1299
+product_image_url = "https://via.placeholder.com/300x300.png?text=Product+Image"  # Placeholder that always loads
+
+# ---------- UI ----------
+st.title("🛍️ Welcome to KalpanaKart")
+
+# Display product card
+with st.container():
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    
+    cols = st.columns([1, 2])
+    
+    with cols[0]:
+        st.image(product_image_url, use_column_width=True)
+
+    with cols[1]:
+        st.markdown(f"### {product_name}")
+        st.markdown(f"💰 **₹{product_price}**")
+        st.markdown("⭐ 4.8 rating (122 reviews)")
+
+        # Styled Buttons
+        st.markdown(
+            f"""
+            <a href="#" class="custom-button cart-button">Add to Cart</a>
+            <a href="#" class="custom-button wishlist-button">❤️ Wishlist</a>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 # import streamlit as st
