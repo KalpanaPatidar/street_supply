@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+navigator.geolocation.getCurrentPosition(
+  function(position) {
+    const coords = position.coords.latitude + "," + position.coords.longitude;
+    parent.postMessage({type: 'location', data: coords}, "*");
+  },
+  function(error) {
+    parent.postMessage({type: 'location', data: 'Indore, India'}, "*");
+  }
+);
+</script>
+</body>
+</html>
