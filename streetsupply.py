@@ -408,7 +408,7 @@ if search:
     # Back button
     if st.button("🔙 Back to Home"):
         st.session_state.menu = "Home"
-        st.experimental_rerun()
+        st.rerun()
 
     st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: " + str(st.session_state.location_filter) + "</div>", unsafe_allow_html=True)
     results = products[products['name'].str.contains(search, case=False)]
