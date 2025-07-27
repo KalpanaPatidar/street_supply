@@ -238,210 +238,161 @@
 #                     st.markdown(f"🔲 {step}")
 #         st.markdown("---")
 
+
+
+
 import streamlit as st
 import pandas as pd
-import requests
-import firebase_admin
-from firebase_admin import credentials, firestore
 from datetime import datetime, timedelta
-from google_auth_oauthlib.flow import Flow
-from googleapiclient.discovery import build
-import webbrowser
 
-# === Setup ===
+# Config
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+
+# Static Banner Image
+st.image(
+    "https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png",
+    caption="Welcome to Bhojan Bazaar - Your Trusted Raw Material Marketplace",
+    use_column_width=True
+)
+
+# Session Setup
+if 'cart' not in st.session_state: st.session_state.cart = []
+if 'wishlist' not in st.session_state: st.session_state.wishlist = []
+if 'menu' not in st.session_state: st.session_state.menu = "Home"
+if 'orders' not in st.session_state:
+    st.session_state.orders = [
+        {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
+        {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
+        {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
+    ]
+if 'back_to_home' not in st.session_state:
+    st.session_state.back_to_home = False
+if 'selected_category' not in st.session_state:
+    st.session_state.selected_category = None
+
+# Load Data
 products = pd.read_csv("india_products_with_locations.csv")
 
-# Firebase Admin setup
-if not firebase_admin._apps:
-    cred = credentials.Certificate(st.secrets["firebase_service_account"])
-    firebase_admin.initialize_app(cred)
-db = firestore.client()
-
-# === Auth Helpers ===
-def auth_flow():
-    redirect_uri = st.secrets["redirect_uri"]
-    flow = Flow.from_client_secrets_file(
-        "client_secret.json",
-        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email"],
-        redirect_uri=redirect_uri
-    )
-    auth_code = st.experimental_get_query_params().get("code")
-    if auth_code:
-        flow.fetch_token(code=auth_code[0])
-        creds = flow.credentials
-        info = build("oauth2", "v2", credentials=creds).userinfo().get().execute()
-        st.session_state.user_info = info
-        st.experimental_rerun()
-    else:
-        if st.button("Sign in with Google"):
-            url, _ = flow.authorization_url(prompt="select_account")
-            webbrowser.open_new_tab(url)
-
-def show_login():
-    st.title("🔐 Login")
-    if "user_info" not in st.session_state:
-        auth_flow()
-    else:
-        st.success(f"Logged in as {st.session_state.user_info['email']}")
-        if st.button("Continue"):
-            st.session_state.authenticated = True
-
-if not st.session_state.get("authenticated"):
-    show_login()
-    st.stop()
-
-# === Session-state defaults ===
-for key in ['cart','wishlist','menu','selected_category','back_to_home']:
-    if key not in st.session_state:
-        st.session_state[key] = [] if key in ['cart','wishlist'] else "Home"
-
-# === Header & Navigation ===
-header_cols = st.columns([1,6,1,1,1])
+# Header Bar
+header_cols = st.columns([1, 7, 1, 1, 1, 1])
 with header_cols[0]:
-    if st.button("🏠"):
-        st.session_state.menu="Home"
-        st.session_state.selected_category=None
-        st.experimental_rerun()
+    if st.button("🏠", help="Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
 with header_cols[4]:
     if st.button("👤 Account"):
-        st.session_state.menu="Account"
+        st.session_state.menu = "Account"
 
-search = st.text_input("Search 9000+ products")
-if search:
-    st.toggle("📍 Nearest (Indore)", key="loc_filter")
+# Centered Search
+st.markdown("""
+    <style>
+    .search-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .search-bar input {
+        width: 50% !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-nav = st.columns([8,1,1,1])
-with nav[1]:
-    if st.button("🛒"): st.session_state.menu="Cart"
-with nav[2]:
-    if st.button("💗"): st.session_state.menu="Wishlist"
-with nav[3]:
-    if st.button("📦"): st.session_state.menu="Orders"
+st.markdown('<div class="search-bar">', unsafe_allow_html=True)
+search = st.text_input("", placeholder="Search 9000+ products")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Sidebar filters
-with st.sidebar:
-    st.header("Filters")
-    min_price, max_price = st.slider("Price range", 0, int(products.price.max()), (0, int(products.price.max())))
-    min_rating = st.slider("Min Rating", 0.0, 5.0, 0.0, 0.1)
+st.sidebar.header("🔍 Filter Products")
+min_rating = st.sidebar.slider("Minimum Rating", 0.0, 5.0, 0.0, 0.5)
+max_price = st.sidebar.number_input("Max Price", value=1000.0)
 
-# Utility functions
+# Nearest Toggle Only for Search
+if search:
+    st.markdown("<div style='text-align:right;'>", unsafe_allow_html=True)
+    st.toggle("📍 Nearest Location", key="location_filter")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Navigation Buttons
+cols = st.columns([8, 1, 1, 1])
+with cols[1]:
+    if st.button("🛒", help="Cart"): st.session_state.menu = "Cart"
+with cols[2]:
+    if st.button("💗", help="Wishlist"): st.session_state.menu = "Wishlist"
+with cols[3]:
+    if st.button("📦", help="Orders"): st.session_state.menu = "Orders"
+
+# Helper functions
 def add_to_cart(pid):
     if pid not in st.session_state.cart:
         st.session_state.cart.append(pid)
-        st.success("✅ Added to cart")
+        st.success("✅ Product added to cart!")
 
 def add_to_wishlist(pid):
     if pid not in st.session_state.wishlist:
         st.session_state.wishlist.append(pid)
-        st.success("💗 Added to wishlist")
+        st.success("💗 Product added to wishlist!")
 
-# === Pages ===
-if st.session_state.menu=="Account":
-    st.subheader("👤 Profile")
-    info = st.session_state.user_info
-    st.write(f"Email: {info['email']}")
-    if st.button("Logout"):
-        for k in ['authenticated','user_info']: st.session_state.pop(k, None)
-        st.experimental_rerun()
+# Account Page
+if st.session_state.menu == "Account":
+    st.subheader("👤 Your Profile")
+    if st.button("✏️ Edit Profile"):
+        st.session_state.edit_mode = not st.session_state.get("edit_mode", False)
+    edit = st.session_state.get("edit_mode", False)
+    name = st.text_input("Full Name", value="Kishan Vendor", disabled=not edit)
+    phone = st.text_input("Phone", value="9876543210", disabled=not edit)
+    email = st.text_input("Email", value="kishan@example.com", disabled=not edit)
+    address = st.text_area("Address", value="Indore", disabled=not edit)
+    if edit:
+        st.button("Save Changes")
+    st.button("🚪 Logout")
 
-elif search:
-    st.subheader(f"Search: '{search}'")
-    if st.button("🔙 Back"):
-        st.session_state.menu="Home"
-        st.experimental_rerun()
-    results = products[products.name.str.contains(search, case=False)]
-    if st.session_state.loc_filter:
-        results = results[results.supplier_location.str.contains("Indore",case=False)]
-    results = results[(results.price >= min_price) & (results.rating >= min_rating)]
+# Search Results Page (dynamic)
+if search:
+    st.subheader(f"🔍 Search Results for '{search}'")
+    if st.session_state.get("location_filter"):
+        st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: True</div>", unsafe_allow_html=True)
+    if st.button("🔙 Back to Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+    results = products[products['name'].str.contains(search, case=False)]
+    if st.session_state.get("location_filter"):
+        results = results[results['supplier_location'].str.contains("Indore", case=False)]
+    results = results[(results['rating'] >= min_rating) & (results['price'] <= max_price)]
     if results.empty:
-        st.info("No match")
-    for _, r in results.iterrows():
-        st.markdown(f"**{r.name}** ({r.supplier}) | ₹{r.price*(1-r.discount/100):.2f} | ⭐{r.rating}")
-        cols = st.columns(3)
-        with cols[0]:
-            if st.button("Add to Cart", key=f"search_cart_{r.product_id}"): add_to_cart(r.product_id)
-        with cols[1]:
-            if st.button("💗", key=f"search_wish_{r.product_id}"): add_to_wishlist(r.product_id)
-        with cols[2]:
-            if st.button("Order Now", key=f"search_order_{r.product_id}"):
-                st.markdown("[Order on JioMart](https://www.jiomart.com/)")
+        st.info("No products found matching the search criteria.")
+    for _, row in results.iterrows():
+        st.markdown(f"""
+        **{row['name']}** from **{row['supplier']}**  
+        Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
+        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
+        """)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Add to Cart", key=f"cart_{row['product_id']}"):
+                add_to_cart(row['product_id'])
+        with col2:
+            if st.button("💗 Wishlist", key=f"wish_{row['product_id']}"):
+                add_to_wishlist(row['product_id'])
+        with col3:
+            st.button("Order Now", key=f"order_{row['product_id']}")
+        st.markdown("---")
 
-elif st.session_state.menu=="Home":
+# Home Page - Categories with Grid
+elif st.session_state.menu == "Home":
+    if st.session_state.back_to_home:
+        st.session_state.back_to_home = False
+
     st.subheader("🛒 Categories")
-    cats = products.category.dropna().unique().tolist()
-    icons = {...}  # your image_map dict
-    for i in range(0,len(cats),4):
-        cols = st.columns(4)
-        for j,cat in enumerate(cats[i:i+4]):
-            with cols[j]:
-                st.image(icons.get(cat, ""), width=80)
-                if st.button(cat, key=f"cat_{cat}"):
-                    st.session_state.menu="Category"
-                    st.session_state.selected_category=cat
-                    st.experimental_rerun()
+    image_map = {
+        "Edible Oil": "https://cdn-icons-png.flaticon.com/512/3125/3125713.png",
+        "Grains": "https://cdn-icons-png.flaticon.com/512/1704/1704780.png",
+        "Spices": "https://cdn-icons-png.flaticon.com/512/1999/1999625.png",
+        "Cleaning Supplies": "https://cdn-icons-png.flaticon.com/512/679/679922.png",
+        "Dairy": "https://cdn-icons-png.flaticon.com/512/3174/3174880.png",
+        "Sauces": "https://cdn-icons-png.flaticon.com/512/3480/3480210.png",
+        "Packaging Material": "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
+        "Sweetener": "https://cdn-icons-png.flaticon.com/512/1046/1046789.png"
+    }
 
-elif st.session_state.menu=="Category" and st.session_state.selected_category:
-    if st.button("🔙 Back"): 
-        st.session_state.menu="Home"
-        st.session_state.selected_category=None
-        st.experimental_rerun()
-    cat = st.session_state.selected_category
-    st.subheader(f"{cat} items")
-    df = products[(products.category==cat)&(products.price>=min_price)&(products.rating>=min_rating)]
-    for _, r in df.iterrows():
-        st.markdown(f"**{r.name}** from {r.supplier} | ₹{r.price*(1-r.discount/100):.2f} | ⭐{r.rating}")
-        c1,c2,c3 = st.columns(3)
-        with c1:
-            if st.button("Add to Cart", key=f"cat_cart_{r.product_id}"): add_to_cart(r.product_id)
-        with c2:
-            if st.button("💗", key=f"cat_wish_{r.product_id}"): add_to_wishlist(r.product_id)
-        with c3:
-            if st.button("Order Now", key=f"cat_order_{r.product_id}"):
-                st.markdown("[Order on JioMart](https://www.jiomart.com/)")
-
-elif st.session_state.menu=="Cart":
-    st.subheader("🛍️ Cart")
-    total=0
-    for pid in st.session_state.cart:
-        r = products[products.product_id==pid].iloc[0]
-        price = r.price*(1-r.discount/100)
-        total+=price
-        st.write(f"{r.name} - ₹{price:.2f}")
-        c1,c2 = st.columns(2)
-        with c1:
-            if st.button("❌ Remove", key=f"rm_{pid}"):
-                st.session_state.cart.remove(pid); st.experimental_rerun()
-        with c2:
-            if st.button("💗 Save", key=f"sv_{pid}"):
-                st.session_state.wishlist.append(pid); st.session_state.cart.remove(pid); st.experimental_rerun()
-    st.markdown(f"**Total: ₹{total:.2f}**")
-    if st.button("✅ Place Order"):
-        order = {"user": st.session_state.user_info['email'],
-                 "items": st.session_state.cart,
-                 "timestamp": datetime.utcnow()}
-        db.collection("orders").add(order)
-        st.success("Order placed!")
-        st.session_state.cart=[]
-
-elif st.session_state.menu=="Wishlist":
-    st.subheader("💗 Wishlist")
-    for pid in st.session_state.wishlist:
-        r = products[products.product_id==pid].iloc[0]
-        st.write(f"{r.name} - ₹{r.price:.2f}")
-        c1,c2 = st.columns(2)
-        with c1:
-            if st.button("🛒 Add to Cart", key=f"wc_{pid}"):
-                st.session_state.cart.append(pid); st.session_state.wishlist.remove(pid); st.experimental_rerun()
-        with c2:
-            if st.button("❌ Remove", key=f"wr_{pid}"):
-                st.session_state.wishlist.remove(pid); st.experimental_rerun()
-
-elif st.session_state.menu=="Orders":
-    st.subheader("📦 Your Orders")
-    orders = db.collection("orders").where("user", "==", st.session_state.user_info['email']).stream()
-    for doc in orders:
-        o = doc.to_dict()
-        ts = o.get("timestamp")
-        st.write(f"Order at {ts.strftime('%Y‑%m‑%d %H:%M:%S')}")
-        st.write("Items:", o.get("items"))
