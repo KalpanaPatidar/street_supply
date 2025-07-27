@@ -155,8 +155,8 @@ if search:
     if results.empty:
         st.info("No products found matching the search criteria.")
     for _, row in results.iterrows():
-        st.markdown(f"""
-        *{row['name']}* from *{row['supplier']}*  
+       st.markdown(f"*{row['name']}* from *{row['supplier']}*")
+ 
         Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
         ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
         """)
