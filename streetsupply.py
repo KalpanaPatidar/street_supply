@@ -85,7 +85,9 @@ with top_col1:
 # with top_col2:
 #     search_query = st.text_input("Search products...", "", key="search_input", label_visibility="collapsed")
 
-
+   # with top_col3:
+    if st.button("👤 Account"):
+        st.session_state.menu = "Account"
 
 
 
@@ -111,9 +113,7 @@ with cols[2]:
 with cols[3]:
     if st.button("📦", help="Orders"): st.session_state.menu = "Orders"
 
-    with top_col3:
-    if st.button("👤 Account"):
-        st.session_state.menu = "Account"
+
 
 
 # --- Helper Functions ---
