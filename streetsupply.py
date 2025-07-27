@@ -115,24 +115,27 @@ if search:
     if results.empty:
         st.info("No products found matching the search criteria.")
     for _, row in results.iterrows():
-     st.markdown(f"""
-     **{row['name']}** from **{row['supplier']}**  
-     Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
-     ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
-     """)
-    
-    col1, col2, col3 = st.columns(3)
+    with st.form(key=f"form_{row['product_id']}"):
+        st.markdown(f"""
+        **{row['name']}** from **{row['supplier']}**  
+        Price: ₹{row['price']} | Discounted: ₹{row['price']*(1 - row['discount']/100):.2f}  
+        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
+        """)
+        
+        col1, col2, col3 = st.columns(3)
 
-    with col1:
-        if st.button("Add to Cart", key=f"cart_{row['product_id']}"):
+        with col1:
+            add = st.form_submit_button("Add to Cart")
+        with col2:
+            wish = st.form_submit_button("💗 Wishlist")
+        with col3:
+            order = st.form_submit_button("Order Now")
+
+        if add:
             add_to_cart(row['product_id'])
-
-    with col2:
-        if st.button("💗 Wishlist", key=f"wish_{row['product_id']}"):
+        elif wish:
             add_to_wishlist(row['product_id'])
-
-    with col3:
-        if st.button("Order Now", key=f"order_{row['product_id']}"):
+        elif order:
             today = datetime.now()
             st.session_state.orders.append({
                 "product_id": row["product_id"],
@@ -143,6 +146,7 @@ if search:
             st.success("🎉 Order Placed Successfully!")
 
     st.markdown("---")
+
 
 
 
