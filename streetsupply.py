@@ -3,80 +3,10 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-# st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
 
-# # Stylish Heading & Subheading
-# st.markdown("""
-#     <h1 style='
-#         text-align: center;
-#         font-weight: 700;
-#         color: #2c3e50;
-#         font-size: 40px;
-#         margin-top: 20px;
-#         margin-bottom: 0px;
-#         font-family: "Segoe UI", "Roboto", sans-serif;
-#     '>
-#         Welcome to Bhojan Bazaar
-#     </h1>
-#     <h3 style='
-#         text-align: center;
-#         color: #7f8c8d;
-#         font-size: 20px;
-#         font-weight: 400;
-#         margin-bottom: 30px;
-#     '>
-#         Your Trusted Raw Material Marketplace
-#     </h3>
-# """, unsafe_allow_html=True)
-# # Session Setup
-# if 'cart' not in st.session_state: st.session_state.cart = []
-# if 'wishlist' not in st.session_state: st.session_state.wishlist = []
-# if 'menu' not in st.session_state: st.session_state.menu = "Home"
-# if 'orders' not in st.session_state:
-#     st.session_state.orders = [
-#         {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
-#         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
-#         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
-#     ]
-# if 'back_to_home' not in st.session_state:
-#     st.session_state.back_to_home = False
-# if 'selected_category' not in st.session_state:
-#     st.session_state.selected_category = None
-
-# # Load Data
-# products = pd.read_csv("india_products_with_locations.csv")
-
-# # Header Bar
-# header_cols = st.columns([1, 7, 1, 1, 1, 1])
-# with header_cols[0]:
-#     if st.button("🏠", help="Home"):
-#         st.session_state.menu = "Home"
-#         st.session_state.selected_category = None
-#         st.rerun()
-# with header_cols[4]:
-#     if st.button("👤 Account"):
-#         st.session_state.menu = "Account"
-
-# # Centered Search
-# st.markdown("""
-#     <style>
-#     .search-bar {
-#         display: flex;
-#         justify-content: center;
-#         # margin-bottom: 20px;
-#     }
-#     .search-bar input {
-#         width: 50% !important;
-#     }
-#     </style>
-# """, unsafe_allow_html=True)
-
-import streamlit as st
-import pandas as pd
-from datetime import datetime, timedelta
-
-# ---------- 🪄 Styling Top Heading ----------
+# Stylish Heading & Subheading
 st.markdown("""
     <h1 style='
         text-align: center;
@@ -99,8 +29,7 @@ st.markdown("""
         Your Trusted Raw Material Marketplace
     </h3>
 """, unsafe_allow_html=True)
-
-# ---------- 💾 Session State Setup ----------
+# Session Setup
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
 if 'menu' not in st.session_state: st.session_state.menu = "Home"
@@ -110,44 +39,39 @@ if 'orders' not in st.session_state:
         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
     ]
-if 'back_to_home' not in st.session_state: st.session_state.back_to_home = False
-if 'selected_category' not in st.session_state: st.session_state.selected_category = None
+if 'back_to_home' not in st.session_state:
+    st.session_state.back_to_home = False
+if 'selected_category' not in st.session_state:
+    st.session_state.selected_category = None
 
-# ---------- 📦 Load Product Data ----------
+# Load Data
 products = pd.read_csv("india_products_with_locations.csv")
 
-# ---------- 🎨 Top Bar CSS Styling ----------
+# Header Bar
+header_cols = st.columns([1, 7, 1, 1, 1, 1])
+with header_cols[0]:
+    if st.button("🏠", help="Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+with header_cols[4]:
+    if st.button("👤 Account"):
+        st.session_state.menu = "Account"
+
+# Centered Search
 st.markdown("""
     <style>
-    .top-bar {
+    .search-bar {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 30px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        margin-bottom: 25px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        justify-content: center;
+        # margin-bottom: 20px;
     }
-    .top-bar .stButton>button {
-        background-color: #3498db;
-        color: white;
-        border: none;
-        padding: 8px 18px;
-        border-radius: 20px;
-        font-size: 14px;
-        cursor: pointer;
-    }
-    .top-bar .stTextInput>div>input {
-        width: 100%;
-        padding: 10px 15px;
-        border: 1px solid #ccc;
-        border-radius: 25px;
-        font-size: 16px;
-        outline: none;
+    .search-bar input {
+        width: 50% !important;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 # ---------- 📌 Top Bar Layout ----------
 top_col1, top_col2, top_col3 = st.columns([1, 5, 1.2])
