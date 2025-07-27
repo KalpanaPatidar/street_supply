@@ -271,8 +271,18 @@ elif st.session_state.menu == "Cart":
         st.radio("Payment Mode", ["Cash on Delivery"], key="pay_mode")
 
         if st.button("✅ Place Order"):
-            st.success("🎉 Order Placed with Cash on Delivery!")
-            st.session_state.cart = []
+            today = datetime.now()
+            for pid in st.session_state.cart:
+                item = products[products['product_id'] == pid].iloc[0]
+                st.session_state.orders.append({
+                "product_id": item['product_id'],
+                "name": item['name'],
+                "status": "Order Placed",
+                "estimated_date": (today + timedelta(days=3)).strftime('%Y-%m-%d')
+        })
+           st.success("🎉 Order Placed Successfully with Cash on Delivery!")
+           st.session_state.cart = []
+
 
 # Wishlist Page
 elif st.session_state.menu == "Wishlist":
@@ -293,21 +303,29 @@ elif st.session_state.menu == "Wishlist":
 # Orders Page
 elif st.session_state.menu == "Orders":
     st.subheader("📦 Your Orders")
-    for order in st.session_state.orders:
-        st.markdown(f"### {order['name']}")
-        if order['status'] == "Delivered":
-            st.success(f"✅ Delivered on {order['delivered_date']}")
-        else:
-            st.warning(f"🚚 Status: {order['status']}, Estimated Delivery: {order['estimated_date']}")
-            st.progress(["Order Placed", "Shipped", "Out for Delivery", "Delivered"].index(order['status']) / 3.0)
-        with st.expander("View Tracking Details"):
+
+    if not st.session_state.orders:
+        st.info("You have no orders yet.")
+    else:
+        for order in st.session_state.orders:
+            st.markdown(f"### 🧺 {order['name']}")
+            current_status = order['status']
             steps = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]
-            for step in steps:
-                if steps.index(step) <= steps.index(order['status']):
-                    st.markdown(f"✅ {step}")
-                else:
-                    st.markdown(f"🔲 {step}")
-        # st.markdown("---")
+
+            if current_status == "Delivered":
+                st.success(f"✅ Delivered on {order.get('delivered_date', 'N/A')}")
+            else:
+                st.warning(f"🚚 Status: {current_status}, Estimated Delivery: {order['estimated_date']}")
+                st.progress(steps.index(current_status) / 3.0)
+
+            with st.expander("📍 View Tracking Details"):
+                for step in steps:
+                    if steps.index(step) <= steps.index(current_status):
+                        st.markdown(f"✅ {step}")
+                    else:
+                        st.markdown(f"🔲 {step}")
+            st.markdown("---")
+
 
 
 
