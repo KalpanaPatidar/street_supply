@@ -409,7 +409,7 @@ if search:
     if st.button("🔙 Back to Home"):
         st.session_state.menu = "Home"
         st.session_state["search"] = ""  # Clear search query
-        st.experimental_rerun()
+        st.rerun()
 
     st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: " + str(st.session_state.location_filter) + "</div>", unsafe_allow_html=True)
 
