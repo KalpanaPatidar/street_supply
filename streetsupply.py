@@ -280,9 +280,9 @@ elif st.session_state.menu == "Cart":
                 "status": "Order Placed",
                 "estimated_date": (today + timedelta(days=3)).strftime('%Y-%m-%d')
         })
-           st.success("🎉 Order Placed Successfully with Cash on Delivery!")
-           st.session_state.cart = []
-
+            st.success("🎉 Order Placed Successfully with Cash on Delivery!")
+            st.session_state.cart = []
+   
 
 # Wishlist Page
 elif st.session_state.menu == "Wishlist":
