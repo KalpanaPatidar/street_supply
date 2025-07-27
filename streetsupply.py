@@ -644,29 +644,11 @@ from datetime import datetime, timedelta
 
 # ---------------- HEADER ----------------
 st.markdown("""
-    <h1 style='
-        text-align: center;
-        font-weight: 700;
-        color: #2c3e50;
-        font-size: 40px;
-        margin-top: 20px;
-        margin-bottom: 0px;
-        font-family: "Segoe UI", "Roboto", sans-serif;
-    '>
-        Welcome to Bhojan Bazaar
-    </h1>
-    <h3 style='
-        text-align: center;
-        color: #7f8c8d;
-        font-size: 20px;
-        font-weight: 400;
-        margin-bottom: 30px;
-    '>
-        Your Trusted Raw Material Marketplace
-    </h3>
+    <h1 style='text-align: center; font-weight: 700; color: #2c3e50; font-size: 40px; margin-top: 20px; margin-bottom: 0px; font-family: "Segoe UI", "Roboto", sans-serif;'>Welcome to Bhojan Bazaar</h1>
+    <h3 style='text-align: center; color: #7f8c8d; font-size: 20px; font-weight: 400; margin-bottom: 30px;'>Your Trusted Raw Material Marketplace</h3>
 """, unsafe_allow_html=True)
 
-# ---------------- SESSION SETUP ----------------
+# ---------------- SESSION ----------------
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
 if 'menu' not in st.session_state: st.session_state.menu = "Home"
@@ -681,37 +663,10 @@ if 'selected_category' not in st.session_state: st.session_state.selected_catego
 # ---------------- CSS ----------------
 st.markdown("""
     <style>
-    .top-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 20px;
-        background-color: #f9f9f9;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
-    }
-    .top-bar .stButton>button {
-        background-color: #3498db;
-        color: white;
-        padding: 10px 22px;
-        border-radius: 25px;
-        border: none;
-        font-size: 15px;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-    .top-bar .stButton>button:hover {
-        background-color: #2980b9;
-    }
-    .top-bar .stTextInput>div>input {
-        width: 100%;
-        padding: 12px 20px;
-        border-radius: 30px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-        outline: none;
-    }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); margin-bottom: 30px; }
+    .top-bar .stButton>button { background-color: #3498db; color: white; padding: 10px 22px; border-radius: 25px; border: none; font-size: 15px; font-weight: bold; transition: 0.2s; }
+    .top-bar .stButton>button:hover { background-color: #2980b9; }
+    .top-bar .stTextInput>div>input { width: 100%; padding: 12px 20px; border-radius: 30px; border: 1px solid #ccc; font-size: 16px; outline: none; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -732,6 +687,18 @@ with col3:
 # ---------------- LOAD DATA ----------------
 products = pd.read_csv("india_products_with_locations.csv")
 
+# TEMP DEBUG: Show columns
+# st.write("Available columns:", products.columns.tolist())
+
+# Normalize column names
+products.columns = products.columns.str.strip()
+
+# Check if expected columns exist
+required_columns = ['Product Name', 'Location', 'Price']
+if not all(col in products.columns for col in required_columns):
+    st.error("❌ CSV is missing required columns: 'Product Name', 'Location', or 'Price'")
+    st.stop()
+
 # ---------------- ACCOUNT PAGE ----------------
 if st.session_state.menu == "Account":
     st.markdown("## 👤 Account Info")
@@ -746,7 +713,7 @@ if st.session_state.menu == "Account":
             st.write(f"Expected by: {order['estimated_date']}")
     st.stop()
 
-# ---------------- PRODUCT DISPLAY ----------------
+# ---------------- HOME PAGE ----------------
 if st.session_state.menu == "Home":
     st.markdown("## 🛍️ Products")
     if search_query:
