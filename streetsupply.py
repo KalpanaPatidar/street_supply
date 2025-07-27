@@ -59,17 +59,17 @@ products = pd.read_csv("india_products_with_locations.csv")
 #         st.session_state.menu = "Account"
 
 # Centered Search
-st.markdown("""
-    <style>
-    .search-bar {
-        display: flex;
-        justify-content: center;
-        # margin-bottom: 20px;
-    }
-    .search-bar input {
-        width: 50% !important;
-    }
-    </style>
+# st.markdown("""
+#     <style>
+#     .search-bar {
+#         display: flex;
+#         justify-content: center;
+#         # margin-bottom: 20px;
+#     }
+#     .search-bar input {
+#         width: 50% !important;
+#     }
+#     </style>
 """, unsafe_allow_html=True)
 
 
