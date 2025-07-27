@@ -1,5 +1,11 @@
 import streamlit as st
 import pandas as pd
+from streamlit.components.v1 import html
+location = st.text_input("Or Enter Location Manually", placeholder="Indore")
+
+
+st.markdown("### 📍 Detecting your location...")
+html(open("location_helper.html").read(), height=200)
 
 # Load data
 products = pd.read_csv('products.csv')
@@ -158,3 +164,65 @@ st.markdown(f"""
     <button style="background-color:#4CAF50;color:white;padding:10px;border:none;border-radius:5px;">💳 Proceed to Pay with Razorpay</button>
 </a>
 """, unsafe_allow_html=True)
+products = pd.read_csv("products.csv")
+
+query = st.text_input("🔍 Search for raw material (e.g., plate, oil)")
+user_location = st.text_input("📍 Your Location (e.g., Indore)")
+
+if query:
+    results = products[products['name'].str.contains(query, case=False)]
+    if user_location:
+        results = results[results['supplier_location'].str.contains(user_location, case=False)]
+    st.dataframe(results[['name', 'price', 'rating', 'supplier', 'supplier_location', 'reviews']])
+
+payment_method = st.radio("💳 Choose Payment Method", ["Cash on Delivery", "Pay Online"])
+
+if st.button("✅ Place Order"):
+    if payment_method == "Cash on Delivery":
+        st.success("Order Placed! Delivery in progress.")
+    else:
+        st.markdown("""
+        <a href="https://rzp.io/l/YOUR_PAYMENT_LINK" target="_blank">
+            <button style="background-color:#4CAF50;color:white;padding:10px;border:none;border-radius:5px;">💳 Pay with Razorpay / UPI</button>
+        </a>
+        """, unsafe_allow_html=True) st.markdown("### 📊 Price and Reviews Comparison")
+
+if query:
+    compare = products[products['name'].str.contains(query, case=False)].sort_values(by=["price", "rating"])
+    for _, row in compare.iterrows():
+        st.markdown(f"""
+        - *{row['name']}* from {row['supplier']}
+        - Price: ₹{row['price']} | Discount: {row['discount']}%
+        - ⭐ {row['rating']} | 📍 {row['supplier_location']}
+        - 💬 Review: {row['reviews']}
+        """)
+        st.markdown("---")   
+
+from streamlit_lottie import st_lottie
+import json
+
+with open("lottie/animation.json") as f:
+    lottie_anim = json.load(f)
+ 
+
+
+import razorpay
+
+# Use your Test Keys
+client = razorpay.Client(auth=("rzp_test_xxxxxx", "xxxxxxxxxxxxx"))
+
+order_data = {
+    "amount": 5000,  # ₹50 in paise
+    "currency": "INR",
+    "payment_capture": "1"
+}
+order = client.order.create(data=order_data)
+st.write("🧾 Razorpay Order ID:", order['id'])
+
+# Payment button
+st.markdown(f"""
+<a href="https://rzp.io/l/YOUR_PAYMENT_LINK" target="_blank">
+    <button style="background-color:#4CAF50;color:white;padding:10px 20px;border:none;border-radius:5px;">💳 Pay Now</button>
+</a>
+""", unsafe_allow_html=True)
+st_lottie(lottie_anim, height=300)
