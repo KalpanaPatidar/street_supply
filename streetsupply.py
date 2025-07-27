@@ -239,160 +239,109 @@
 #         st.markdown("---")
 
 
-
-
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
+import random
 
-# Config
-st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+st.set_page_config(page_title="Street Vendor Supply Portal", layout="wide")
 
-# Static Banner Image
-st.image(
-    "https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png",
-    caption="Welcome to Bhojan Bazaar - Your Trusted Raw Material Marketplace",
-    use_column_width=True
-)
+# Sample Data
+vendors_data = {
+    "username": ["vendor1"],
+    "password": ["1234"]
+}
 
-# Session Setup
-if 'cart' not in st.session_state: st.session_state.cart = []
-if 'wishlist' not in st.session_state: st.session_state.wishlist = []
-if 'menu' not in st.session_state: st.session_state.menu = "Home"
-if 'orders' not in st.session_state:
-    st.session_state.orders = [
-        {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
-        {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
-        {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
-    ]
-if 'back_to_home' not in st.session_state:
-    st.session_state.back_to_home = False
-if 'selected_category' not in st.session_state:
-    st.session_state.selected_category = None
+suppliers_data = pd.DataFrame({
+    "Supplier": ["Ravi Traders", "FreshMart", "Sanjay Foods"],
+    "Location": ["Indore", "Ujjain", "Indore"],
+    "Item": ["Flour", "Oil", "Tomato"],
+    "Price (per kg)": [25, 100, 15],
+    "Contact": ["9876543210", "9876512345", "9876509876"]
+})
 
-# Load Data
-products = pd.read_csv("india_products_with_locations.csv")
+# Simulate session
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-# Header Bar
-header_cols = st.columns([1, 7, 1, 1, 1, 1])
-with header_cols[0]:
-    if st.button("🏠", help="Home"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
-with header_cols[4]:
-    if st.button("👤 Account"):
-        st.session_state.menu = "Account"
+if "role" not in st.session_state:
+    st.session_state.role = None
 
-# Centered Search
-st.markdown("""
-    <style>
-    .search-bar {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-    .search-bar input {
-        width: 50% !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ------------------ UI ------------------- #
 
-st.markdown('<div class="search-bar">', unsafe_allow_html=True)
-search = st.text_input("", placeholder="Search 9000+ products")
-st.markdown('</div>', unsafe_allow_html=True)
+st.title("🍛 Street Vendor Supply Portal")
+st.markdown("Helping street food vendors find **affordable, trusted raw material suppliers.**")
 
-# Sidebar filters
-st.sidebar.header("🔍 Filter Products")
-min_rating = st.sidebar.slider("Minimum Rating", 0.0, 5.0, 0.0, 0.5)
-max_price = st.sidebar.number_input("Max Price", value=1000.0)
+# ------------------ Login / Register ------------------- #
+with st.sidebar:
+    st.header("Login / Register")
 
-# Nearest Toggle Only for Search
-if search:
-    st.markdown("<div style='text-align:right;'>", unsafe_allow_html=True)
-    st.toggle("📍 Nearest Location", key="location_filter")
-    st.markdown("</div>", unsafe_allow_html=True)
+    role = st.radio("Who are you?", ["Vendor", "Supplier"])
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
-# Navigation Buttons
-cols = st.columns([8, 1, 1, 1])
-with cols[1]:
-    if st.button("🛒", help="Cart"): st.session_state.menu = "Cart"
-with cols[2]:
-    if st.button("💗", help="Wishlist"): st.session_state.menu = "Wishlist"
-with cols[3]:
-    if st.button("📦", help="Orders"): st.session_state.menu = "Orders"
+    if st.button("Login"):
+        if role == "Vendor" and username in vendors_data["username"]:
+            idx = vendors_data["username"].index(username)
+            if vendors_data["password"][idx] == password:
+                st.success("Logged in as Vendor")
+                st.session_state.logged_in = True
+                st.session_state.role = "vendor"
+        elif role == "Supplier" and username == "supplier" and password == "1234":
+            st.success("Logged in as Supplier")
+            st.session_state.logged_in = True
+            st.session_state.role = "supplier"
+        else:
+            st.error("Invalid credentials!")
 
-# Helper functions
-def add_to_cart(pid):
-    if pid not in st.session_state.cart:
-        st.session_state.cart.append(pid)
-        st.success("✅ Product added to cart!")
+# ------------------ Vendor Dashboard ------------------- #
+if st.session_state.logged_in and st.session_state.role == "vendor":
+    st.subheader("🔍 Find Suppliers by Location")
 
-def add_to_wishlist(pid):
-    if pid not in st.session_state.wishlist:
-        st.session_state.wishlist.append(pid)
-        st.success("💗 Product added to wishlist!")
+    location = st.selectbox("Choose your location:", suppliers_data["Location"].unique())
+    filtered = suppliers_data[suppliers_data["Location"] == location]
 
-# Account Page
-if st.session_state.menu == "Account":
-    st.subheader("👤 Your Profile")
-    if st.button("✏️ Edit Profile"):
-        st.session_state.edit_mode = not st.session_state.get("edit_mode", False)
-    edit = st.session_state.get("edit_mode", False)
-    name = st.text_input("Full Name", value="Kishan Vendor", disabled=not edit)
-    phone = st.text_input("Phone", value="9876543210", disabled=not edit)
-    email = st.text_input("Email", value="kishan@example.com", disabled=not edit)
-    address = st.text_area("Address", value="Indore", disabled=not edit)
-    if edit:
-        st.button("Save Changes")
-    st.button("🚪 Logout")
+    st.write("### 🛒 Available Suppliers")
+    st.dataframe(filtered)
 
-# Search Results Page (dynamic)
-if search:
-    st.subheader(f"🔍 Search Results for '{search}'")
-    if st.session_state.get("location_filter"):
-        st.markdown("<div style='text-align:right;'>📍 Nearest Location Filter Applied: True</div>", unsafe_allow_html=True)
-    if st.button("🔙 Back to Home"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
-    results = products[products['name'].str.contains(search, case=False)]
-    if st.session_state.get("location_filter"):
-        results = results[results['supplier_location'].str.contains("Indore", case=False)]
-    results = results[(results['rating'] >= min_rating) & (results['price'] <= max_price)]
-    if results.empty:
-        st.info("No products found matching the search criteria.")
-    for _, row in results.iterrows():
-        st.markdown(f"""
-        **{row['name']}** from **{row['supplier']}**  
-        Price: ₹{row['price']} | Discounted: ₹{row['price']*(1-row['discount']/100):.2f}  
-        ⭐ {row['rating']} | 📍 {row['supplier_location']} | 🚚 ₹{row['delivery_charge']}
-        """)
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("Add to Cart", key=f"cart_{row['product_id']}"):
-                add_to_cart(row['product_id'])
-        with col2:
-            if st.button("💗 Wishlist", key=f"wish_{row['product_id']}"):
-                add_to_wishlist(row['product_id'])
-        with col3:
-            st.button("Order Now", key=f"order_{row['product_id']}")
-        st.markdown("---")
+    if st.button("Place Group Order"):
+        st.success("✅ Group Order Placed! Supplier will contact you soon.")
 
-# Home Page - Categories with Grid
-elif st.session_state.menu == "Home":
-    if st.session_state.back_to_home:
-        st.session_state.back_to_home = False
+# ------------------ Supplier Dashboard ------------------- #
+if st.session_state.logged_in and st.session_state.role == "supplier":
+    st.subheader("📦 Supplier Dashboard")
+    st.write("Update or Add New Raw Materials")
 
-    st.subheader("🛒 Categories")
-    image_map = {
-        "Edible Oil": "https://cdn-icons-png.flaticon.com/512/3125/3125713.png",
-        "Grains": "https://cdn-icons-png.flaticon.com/512/1704/1704780.png",
-        "Spices": "https://cdn-icons-png.flaticon.com/512/1999/1999625.png",
-        "Cleaning Supplies": "https://cdn-icons-png.flaticon.com/512/679/679922.png",
-        "Dairy": "https://cdn-icons-png.flaticon.com/512/3174/3174880.png",
-        "Sauces": "https://cdn-icons-png.flaticon.com/512/3480/3480210.png",
-        "Packaging Material": "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
-        "Sweetener": "https://cdn-icons-png.flaticon.com/512/1046/1046789.png"
-    }
+    with st.form("supplier_form"):
+        name = st.text_input("Supplier Name")
+        loc = st.text_input("Location")
+        item = st.text_input("Raw Material")
+        price = st.number_input("Price per kg", min_value=1)
+        contact = st.text_input("Contact Number")
+        submit = st.form_submit_button("Add/Update")
+
+        if submit:
+            new_row = pd.DataFrame({
+                "Supplier": [name],
+                "Location": [loc],
+                "Item": [item],
+                "Price (per kg)": [price],
+                "Contact": [contact]
+            })
+            suppliers_data = pd.concat([suppliers_data, new_row], ignore_index=True)
+            st.success("Updated product list!")
+
+    st.write("### 📋 Current Listings")
+    st.dataframe(suppliers_data)
+
+# ------------------ Footer ------------------- #
+st.markdown("---")
+st.caption("Built in 2 hours for Tutedude Web Hackathon 1.0 🚀")
+
+
+
+
+
+  
+ 
+
 
