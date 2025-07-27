@@ -4,13 +4,12 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 
-# Config
 st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
-# Static Banner Image (no caption)
+# --- Static Banner Image ---
 st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
-# Stylish Heading & Subheading
+# --- Stylish Heading & Subheading ---
 st.markdown("""
     <h1 style='
         text-align: center;
@@ -34,17 +33,7 @@ st.markdown("""
     </h3>
 """, unsafe_allow_html=True)
 
-# Styling for search box
-st.markdown("""
-    <style>
-    .stTextInput input {
-        font-size: 16px;
-        padding: 8px;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Session Setup
+# --- Session State Setup ---
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
 if 'menu' not in st.session_state: st.session_state.menu = "Home"
@@ -56,37 +45,78 @@ if 'orders' not in st.session_state:
     ]
 if 'back_to_home' not in st.session_state: st.session_state.back_to_home = False
 if 'selected_category' not in st.session_state: st.session_state.selected_category = None
+if 'search_query' not in st.session_state: st.session_state.search_query = ""
 
-# Load Data
+# --- Load Product Data ---
 products = pd.read_csv("india_products_with_locations.csv")
 
-# Header Row: Home | Search | Account
-col_home, col_search, col_account = st.columns([1, 6, 1])
+# --- Custom Header: Home | Search Bar | Account ---
+st.markdown("""
+    <style>
+        .custom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+        .home-icon {
+            font-size: 28px;
+            margin-left: 10px;
+            background: none;
+            border: none;
+        }
+        .search-box {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .search-box input {
+            width: 60%;
+            padding: 8px;
+            font-size: 16px;
+        }
+        .account-button {
+            font-size: 16px;
+            margin-right: 15px;
+            background: none;
+            border: none;
+        }
+    </style>
 
-with col_home:
-    if st.button("🏠", help="Home"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
+    <div class="custom-header">
+        <form method="post">
+            <button name="home_click" class="home-icon">🏠</button>
+        </form>
+        <div class="search-box">
+            <form method="post">
+                <input name="search_query" placeholder="Search 9000+ products" />
+            </form>
+        </div>
+        <form method="post">
+            <button name="account_click" class="account-button">👤 Account</button>
+        </form>
+    </div>
+""", unsafe_allow_html=True)
 
-with col_search:
-    search = st.text_input("Search 9000+ products", key="search_query")
+# --- Handle Form Submissions ---
+if "home_click" in st.session_state:
+    st.session_state.menu = "Home"
+    st.session_state.selected_category = None
+    st.rerun()
+if "account_click" in st.session_state:
+    st.session_state.menu = "Account"
+if "search_query" in st.session_state:
+    st.session_state.search_query = st.session_state["search_query"]
 
-with col_account:
-    if st.button("👤 Account"):
-        st.session_state.menu = "Account"
+search = st.session_state.search_query
 
-
-
-
-
-# Nearest Location Toggle (only if something is searched)
+# --- Nearest Location Toggle (only if search) ---
 if search:
     st.markdown("<div style='text-align:right;'>", unsafe_allow_html=True)
     st.toggle("📍 Nearest Location", key="location_filter")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Navigation Buttons
+# --- Navigation Buttons ---
 cols = st.columns([8, 1, 1, 1])
 with cols[1]:
     if st.button("🛒", help="Cart"): st.session_state.menu = "Cart"
@@ -95,7 +125,7 @@ with cols[2]:
 with cols[3]:
     if st.button("📦", help="Orders"): st.session_state.menu = "Orders"
 
-# Helper function
+# --- Helper Functions ---
 def add_to_cart(pid):
     if pid not in st.session_state.cart:
         st.session_state.cart.append(pid)
@@ -106,21 +136,20 @@ def add_to_wishlist(pid):
         st.session_state.wishlist.append(pid)
         st.success("💗 Product added to wishlist!")
 
-# Account Page
+# --- Account Page ---
 if st.session_state.menu == "Account":
     st.subheader("👤 Your Profile")
-    if st.button("✏ Edit Profile"):
+    if st.button("✏️ Edit Profile"):
         st.session_state.edit_mode = not st.session_state.get("edit_mode", False)
     edit = st.session_state.get("edit_mode", False)
     name = st.text_input("Full Name", value="Kishan Vendor", disabled=not edit)
     phone = st.text_input("Phone", value="9876543210", disabled=not edit)
     email = st.text_input("Email", value="kishan@example.com", disabled=not edit)
     address = st.text_area("Address", value="Indore", disabled=not edit)
-    if edit:
-        st.button("Save Changes")
+    if edit: st.button("Save Changes")
     st.button("🚪 Logout")
 
-# Search Results Page (dynamic)
+# --- Search Results Page ---
 if search:
     st.subheader(f"🔍 Search Results for '{search}'")
     if st.session_state.get("location_filter"):
@@ -150,7 +179,6 @@ if search:
         with col3:
             st.button("Order Now", key=f"order_{row['product_id']}")
         st.markdown("---")
-
 
 
 # Home Page - Categories with Grid
