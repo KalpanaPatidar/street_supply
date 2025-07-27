@@ -358,400 +358,400 @@
 
 
 
-import streamlit as st
-import pandas as pd
-from datetime import datetime
-import json
-import os
-
-# ========================== CONFIG ==========================
-
-st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
-
-# ====================== Load Product Data ===================
-
-@st.cache_data
-def load_data():
-    return pd.read_csv("products.csv")
-
-products = load_data()
-
-# ==================== Session State =========================
-
-for key in ['cart', 'wishlist']:
-    if key not in st.session_state:
-        st.session_state[key] = []
-
-# ====================== Header ==============================
-
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>Bhojan Bazaar 🛒</h1>", unsafe_allow_html=True)
-st.markdown("### India’s Trusted Raw Material Marketplace for Street Food Vendors")
-
-# =================== Sidebar Menu ===========================
-
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3595/3595455.png", width=100)
-st.sidebar.title("📦 Menu")
-menu = st.sidebar.radio("Navigate", ["Home", "Search", "Departments", "Cart", "Wishlist", "Orders"])
-
-# =================== Helper Functions =======================
-
-def add_to_cart(pid):
-    if pid not in st.session_state.cart:
-        st.session_state.cart.append(pid)
-        st.success("✅ Added to cart!")
-
-def add_to_wishlist(pid):
-    if pid not in st.session_state.wishlist:
-        st.session_state.wishlist.append(pid)
-        st.success("💖 Added to wishlist!")
-
-# ====================== Pages ===============================
-
-if menu == "Home":
-    st.success("Welcome to Bhojan Bazaar. Browse fresh raw materials.")
-    st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
-
-elif menu == "Search":
-    query = st.text_input("🔍 Search products")
-    if query:
-        filtered = products[products['name'].str.contains(query, case=False)]
-        for _, row in filtered.iterrows():
-            st.markdown(f"**{row.name}** - ₹{row.price} | ⭐ {row.rating}")
-            c1, c2 = st.columns(2)
-            with c1:
-                st.button("Add to Cart", key=f"cart_{row.product_id}", on_click=add_to_cart, args=(row.product_id,))
-            with c2:
-                st.button("💗 Wishlist", key=f"wish_{row.product_id}", on_click=add_to_wishlist, args=(row.product_id,))
-
-elif menu == "Departments":
-    dept = st.selectbox("Select Category", products['category'].unique())
-    filtered = products[products['category'] == dept]
-    for _, row in filtered.iterrows():
-        final_price = row.price * (1 - row.discount / 100)
-        st.markdown(f"**{row.name}** | ₹{final_price:.2f} | ⭐ {row.rating} | 🏪 {row.supplier}")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.button("Add to Cart", key=f"dept_cart_{row.product_id}", on_click=add_to_cart, args=(row.product_id,))
-        with c2:
-            st.button("💗 Wishlist", key=f"dept_wish_{row.product_id}", on_click=add_to_wishlist, args=(row.product_id,))
-
-elif menu == "Cart":
-    st.subheader("🛍️ Your Cart")
-    total = 0
-    for pid in st.session_state.cart:
-        item = products[products.product_id == pid].iloc[0]
-        price = item.price * (1 - item.discount / 100)
-        total += price
-        st.write(f"{item.name} - ₹{price:.2f}")
-    st.markdown(f"**Total: ₹{total:.2f}**")
-    if st.button("✅ Place Order"):
-        st.success("🎉 Order Placed Successfully!")
-        st.session_state.cart.clear()
-
-elif menu == "Wishlist":
-    st.subheader("💖 Your Wishlist")
-    for pid in st.session_state.wishlist:
-        item = products[products.product_id == pid].iloc[0]
-        st.write(f"{item.name} - ₹{item.price}")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.button("🛒 Add to Cart", key=f"wish_cart_{pid}", on_click=add_to_cart, args=(pid,))
-        with c2:
-            st.button("❌ Remove", key=f"wish_remove_{pid}", on_click=lambda pid=pid: st.session_state.wishlist.remove(pid))
-
-elif menu == "Orders":
-    st.subheader("📦 Your Orders")
-
-
-# ========================== CONFIG ==========================
-
-st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
-
-# ===================== User Management =======================
-
-USERS_FILE = "users.json"
-
-def load_users():
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
-    return {}
-
-def save_users(users):
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f, indent=4)
-
-def signup_user(email, password):
-    users = load_users()
-    if email in users:
-        return False, "User already exists."
-    users[email] = {"password": password, "cart": [], "wishlist": [], "orders": []}
-    save_users(users)
-    return True, "Account created successfully."
-
-def login_user(email, password):
-    users = load_users()
-    if email in users and users[email]["password"] == password:
-        return True
-    return False
-
-# ====================== Load Product Data ====================
-
-@st.cache_data
-
-def load_data():
-    return pd.read_csv("products.csv")
-
-products = load_data()
-
-# ===================== Session Initialization ===============
-
-for key in ['authenticated', 'user_email', 'page']:
-    if key not in st.session_state:
-        st.session_state[key] = None if key != 'page' else 'Login'
-
-# ========== AUTH UI: SIGN UP / LOGIN SYSTEM ==================
-
-if not st.session_state.authenticated:
-    st.title("🔐 Welcome to Bhojan Bazaar")
-
-    tab1, tab2 = st.tabs(["Login", "Sign Up"])
-
-    with tab1:
-        login_email = st.text_input("Email", key="login_email")
-        login_pass = st.text_input("Password", type="password", key="login_pass")
-        if st.button("Login"):
-            if login_user(login_email, login_pass):
-                st.session_state.authenticated = True
-                st.session_state.user_email = login_email
-                st.success("Logged in successfully!")
-                st.experimental_rerun()
-            else:
-                st.error("Invalid credentials.")
-
-    with tab2:
-        signup_email = st.text_input("New Email", key="signup_email")
-        signup_pass = st.text_input("New Password", type="password", key="signup_pass")
-        if st.button("Sign Up"):
-            ok, msg = signup_user(signup_email, signup_pass)
-            if ok:
-                st.success(msg)
-            else:
-                st.error(msg)
-
-    st.stop()
-
-# ====================== Header ==============================
-
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>Bhojan Bazaar 🛒</h1>", unsafe_allow_html=True)
-st.markdown("### India’s Trusted Raw Material Marketplace for Street Food Vendors")
-
-# =================== Sidebar Menu ===========================
-
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3595/3595455.png", width=100)
-st.sidebar.title("📦 Menu")
-menu = st.sidebar.radio("Navigate", ["Home", "Search", "Departments", "Cart", "Wishlist", "Orders", "Logout"])
-
-# =================== Helper Functions =======================
-
-def add_to_list(pid, list_name):
-    users = load_users()
-    email = st.session_state.user_email
-    if pid not in users[email][list_name]:
-        users[email][list_name].append(pid)
-        save_users(users)
-        st.success(f"✅ Added to {list_name}!")
-
-def remove_from_list(pid, list_name):
-    users = load_users()
-    email = st.session_state.user_email
-    if pid in users[email][list_name]:
-        users[email][list_name].remove(pid)
-        save_users(users)
-
-# ====================== Pages ===============================
-
-users = load_users()
-user_data = users[st.session_state.user_email]
-
-if menu == "Home":
-    st.success("Welcome to Bhojan Bazaar. Browse fresh raw materials.")
-    st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
-
-elif menu == "Search":
-    query = st.text_input("🔍 Search products")
-    if query:
-        filtered = products[products['name'].str.contains(query, case=False)]
-        for _, row in filtered.iterrows():
-            st.markdown(f"**{row.name}** - ₹{row.price} | ⭐ {row.rating}")
-            c1, c2 = st.columns(2)
-            with c1:
-                st.button("Add to Cart", key=f"cart_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'cart'))
-            with c2:
-                st.button("💗 Wishlist", key=f"wish_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'wishlist'))
-
-elif menu == "Departments":
-    dept = st.selectbox("Select Category", products['category'].unique())
-    filtered = products[products['category'] == dept]
-    for _, row in filtered.iterrows():
-        final_price = row.price * (1 - row.discount / 100)
-        st.markdown(f"**{row.name}** | ₹{final_price:.2f} | ⭐ {row.rating} | 🏪 {row.supplier}")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.button("Add to Cart", key=f"dept_cart_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'cart'))
-        with c2:
-            st.button("💗 Wishlist", key=f"dept_wish_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'wishlist'))
-
-elif menu == "Cart":
-    st.subheader("🛍️ Your Cart")
-    total = 0
-    for pid in user_data['cart']:
-        item = products[products.product_id == pid].iloc[0]
-        price = item.price * (1 - item.discount / 100)
-        total += price
-        st.write(f"{item.name} - ₹{price:.2f}")
-    st.markdown(f"**Total: ₹{total:.2f}**")
-    if st.button("✅ Place Order"):
-        user_data['orders'].append({"items": user_data['cart'], "timestamp": datetime.utcnow().isoformat()})
-        user_data['cart'] = []
-        save_users(users)
-        st.success("🎉 Order Placed Successfully!")
-
-elif menu == "Wishlist":
-    st.subheader("💖 Your Wishlist")
-    for pid in user_data['wishlist']:
-        item = products[products.product_id == pid].iloc[0]
-        st.write(f"{item.name} - ₹{item.price}")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.button("🛒 Add to Cart", key=f"wish_cart_{pid}", on_click=add_to_list, args=(pid, 'cart'))
-        with c2:
-            st.button("❌ Remove", key=f"wish_remove_{pid}", on_click=remove_from_list, args=(pid, 'wishlist'))
-
-elif menu == "Orders":
-    st.subheader("📦 Your Orders")
-    for order in user_data['orders']:
-        st.markdown(f"📅 {order['timestamp']}")
-        st.write("🛒 Items:", order['items'])
-
-elif menu == "Logout":
-    st.session_state.authenticated = False
-    st.session_state.user_email = None
-    st.success("You have been logged out.")
-    st.experimental_rerun()
-
-
 # import streamlit as st
 # import pandas as pd
-# from datetime import datetime, timedelta
+# from datetime import datetime
+# import json
+# import os
 
-# # ---------------- HEADER ----------------
-# st.markdown("""
-#     <h1 style='text-align: center; font-weight: 700; color: #2c3e50; font-size: 40px; margin-top: 20px; margin-bottom: 0px; font-family: "Segoe UI", "Roboto", sans-serif;'>Welcome to Bhojan Bazaar</h1>
-#     <h3 style='text-align: center; color: #7f8c8d; font-size: 20px; font-weight: 400; margin-bottom: 30px;'>Your Trusted Raw Material Marketplace</h3>
-# """, unsafe_allow_html=True)
+# # ========================== CONFIG ==========================
 
-# # ---------------- SESSION ----------------
-# if 'cart' not in st.session_state: st.session_state.cart = []
-# if 'wishlist' not in st.session_state: st.session_state.wishlist = []
-# if 'menu' not in st.session_state: st.session_state.menu = "Home"
-# if 'orders' not in st.session_state:
-#     st.session_state.orders = [
-#         {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
-#         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
-#         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
-#     ]
-# if 'selected_category' not in st.session_state: st.session_state.selected_category = None
+# st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 
-# # ---------------- CSS ----------------
-# st.markdown("""
-#     <style>
-#     .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); margin-bottom: 30px; }
-#     .top-bar .stButton>button { background-color: #3498db; color: white; padding: 10px 22px; border-radius: 25px; border: none; font-size: 15px; font-weight: bold; transition: 0.2s; }
-#     .top-bar .stButton>button:hover { background-color: #2980b9; }
-#     .top-bar .stTextInput>div>input { width: 100%; padding: 12px 20px; border-radius: 30px; border: 1px solid #ccc; font-size: 16px; outline: none; }
-#     </style>
-# """, unsafe_allow_html=True)
+# # ====================== Load Product Data ===================
 
-# # ---------------- NAV BAR ----------------
-# col1, col2, col3 = st.columns([1.2, 5, 1.2])
-# with col1:
-#     if st.button("🏠 Home"):
-#         st.session_state.menu = "Home"
-#         st.session_state.selected_category = None
-#         st.rerun()
-# with col2:
-#     search_query = st.text_input("Search products...", "", key="search_input", label_visibility="collapsed")
-# with col3:
-#     if st.button("👤 Account"):
-#         st.session_state.menu = "Account"
-#         st.rerun()
+# @st.cache_data
+# def load_data():
+#     return pd.read_csv("products.csv")
 
-# # ---------------- LOAD DATA ----------------
-# products = pd.read_csv("india_products_with_locations.csv")
+# products = load_data()
 
-# # TEMP DEBUG: Show columns
-# # st.write("Available columns:", products.columns.tolist())
+# # ==================== Session State =========================
 
-# # Normalize column names
-# products.columns = products.columns.str.strip()
+# for key in ['cart', 'wishlist']:
+#     if key not in st.session_state:
+#         st.session_state[key] = []
 
-# # Check if expected columns exist
-# required_columns = ['Product Name', 'Location', 'Price']
-# if not all(col in products.columns for col in required_columns):
-#     st.error("❌ CSV is missing required columns: 'Product Name', 'Location', or 'Price'")
+# # ====================== Header ==============================
+
+# st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>Bhojan Bazaar 🛒</h1>", unsafe_allow_html=True)
+# st.markdown("### India’s Trusted Raw Material Marketplace for Street Food Vendors")
+
+# # =================== Sidebar Menu ===========================
+
+# st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3595/3595455.png", width=100)
+# st.sidebar.title("📦 Menu")
+# menu = st.sidebar.radio("Navigate", ["Home", "Search", "Departments", "Cart", "Wishlist", "Orders"])
+
+# # =================== Helper Functions =======================
+
+# def add_to_cart(pid):
+#     if pid not in st.session_state.cart:
+#         st.session_state.cart.append(pid)
+#         st.success("✅ Added to cart!")
+
+# def add_to_wishlist(pid):
+#     if pid not in st.session_state.wishlist:
+#         st.session_state.wishlist.append(pid)
+#         st.success("💖 Added to wishlist!")
+
+# # ====================== Pages ===============================
+
+# if menu == "Home":
+#     st.success("Welcome to Bhojan Bazaar. Browse fresh raw materials.")
+#     st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
+
+# elif menu == "Search":
+#     query = st.text_input("🔍 Search products")
+#     if query:
+#         filtered = products[products['name'].str.contains(query, case=False)]
+#         for _, row in filtered.iterrows():
+#             st.markdown(f"**{row.name}** - ₹{row.price} | ⭐ {row.rating}")
+#             c1, c2 = st.columns(2)
+#             with c1:
+#                 st.button("Add to Cart", key=f"cart_{row.product_id}", on_click=add_to_cart, args=(row.product_id,))
+#             with c2:
+#                 st.button("💗 Wishlist", key=f"wish_{row.product_id}", on_click=add_to_wishlist, args=(row.product_id,))
+
+# elif menu == "Departments":
+#     dept = st.selectbox("Select Category", products['category'].unique())
+#     filtered = products[products['category'] == dept]
+#     for _, row in filtered.iterrows():
+#         final_price = row.price * (1 - row.discount / 100)
+#         st.markdown(f"**{row.name}** | ₹{final_price:.2f} | ⭐ {row.rating} | 🏪 {row.supplier}")
+#         c1, c2 = st.columns(2)
+#         with c1:
+#             st.button("Add to Cart", key=f"dept_cart_{row.product_id}", on_click=add_to_cart, args=(row.product_id,))
+#         with c2:
+#             st.button("💗 Wishlist", key=f"dept_wish_{row.product_id}", on_click=add_to_wishlist, args=(row.product_id,))
+
+# elif menu == "Cart":
+#     st.subheader("🛍️ Your Cart")
+#     total = 0
+#     for pid in st.session_state.cart:
+#         item = products[products.product_id == pid].iloc[0]
+#         price = item.price * (1 - item.discount / 100)
+#         total += price
+#         st.write(f"{item.name} - ₹{price:.2f}")
+#     st.markdown(f"**Total: ₹{total:.2f}**")
+#     if st.button("✅ Place Order"):
+#         st.success("🎉 Order Placed Successfully!")
+#         st.session_state.cart.clear()
+
+# elif menu == "Wishlist":
+#     st.subheader("💖 Your Wishlist")
+#     for pid in st.session_state.wishlist:
+#         item = products[products.product_id == pid].iloc[0]
+#         st.write(f"{item.name} - ₹{item.price}")
+#         c1, c2 = st.columns(2)
+#         with c1:
+#             st.button("🛒 Add to Cart", key=f"wish_cart_{pid}", on_click=add_to_cart, args=(pid,))
+#         with c2:
+#             st.button("❌ Remove", key=f"wish_remove_{pid}", on_click=lambda pid=pid: st.session_state.wishlist.remove(pid))
+
+# elif menu == "Orders":
+#     st.subheader("📦 Your Orders")
+
+
+# # ========================== CONFIG ==========================
+
+# st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
+
+# # ===================== User Management =======================
+
+# USERS_FILE = "users.json"
+
+# def load_users():
+#     if os.path.exists(USERS_FILE):
+#         with open(USERS_FILE, "r") as f:
+#             return json.load(f)
+#     return {}
+
+# def save_users(users):
+#     with open(USERS_FILE, "w") as f:
+#         json.dump(users, f, indent=4)
+
+# def signup_user(email, password):
+#     users = load_users()
+#     if email in users:
+#         return False, "User already exists."
+#     users[email] = {"password": password, "cart": [], "wishlist": [], "orders": []}
+#     save_users(users)
+#     return True, "Account created successfully."
+
+# def login_user(email, password):
+#     users = load_users()
+#     if email in users and users[email]["password"] == password:
+#         return True
+#     return False
+
+# # ====================== Load Product Data ====================
+
+# @st.cache_data
+
+# def load_data():
+#     return pd.read_csv("products.csv")
+
+# products = load_data()
+
+# # ===================== Session Initialization ===============
+
+# for key in ['authenticated', 'user_email', 'page']:
+#     if key not in st.session_state:
+#         st.session_state[key] = None if key != 'page' else 'Login'
+
+# # ========== AUTH UI: SIGN UP / LOGIN SYSTEM ==================
+
+# if not st.session_state.authenticated:
+#     st.title("🔐 Welcome to Bhojan Bazaar")
+
+#     tab1, tab2 = st.tabs(["Login", "Sign Up"])
+
+#     with tab1:
+#         login_email = st.text_input("Email", key="login_email")
+#         login_pass = st.text_input("Password", type="password", key="login_pass")
+#         if st.button("Login"):
+#             if login_user(login_email, login_pass):
+#                 st.session_state.authenticated = True
+#                 st.session_state.user_email = login_email
+#                 st.success("Logged in successfully!")
+#                 st.experimental_rerun()
+#             else:
+#                 st.error("Invalid credentials.")
+
+#     with tab2:
+#         signup_email = st.text_input("New Email", key="signup_email")
+#         signup_pass = st.text_input("New Password", type="password", key="signup_pass")
+#         if st.button("Sign Up"):
+#             ok, msg = signup_user(signup_email, signup_pass)
+#             if ok:
+#                 st.success(msg)
+#             else:
+#                 st.error(msg)
+
 #     st.stop()
 
-# # ---------------- ACCOUNT PAGE ----------------
-# if st.session_state.menu == "Account":
-#     st.markdown("## 👤 Account Info")
-#     st.write("Name: Kalpana Patidar")
-#     st.write("Email: kalpana@example.com")
-#     st.markdown("### 📦 Order History")
-#     for order in st.session_state.orders:
-#         st.write(f"**{order['name']}** - {order['status']}")
-#         if order['status'] == "Delivered":
-#             st.write(f"Delivered on: {order['delivered_date']}")
-#         else:
-#             st.write(f"Expected by: {order['estimated_date']}")
-#     st.stop()
+# # ====================== Header ==============================
 
-# # ---------------- HOME PAGE ----------------
-# if st.session_state.menu == "Home":
-#     st.markdown("## 🛍️ Products")
-#     if search_query:
-#         filtered_products = products[products['Product Name'].str.contains(search_query, case=False, na=False)]
-#     else:
-#         filtered_products = products
+# st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>Bhojan Bazaar 🛒</h1>", unsafe_allow_html=True)
+# st.markdown("### India’s Trusted Raw Material Marketplace for Street Food Vendors")
 
-#     for idx, row in filtered_products.iterrows():
-#         with st.container():
-#             cols = st.columns([2, 4, 2])
-#             with cols[0]:
-#                 st.image("https://via.placeholder.com/150", width=120)
-#             with cols[1]:
-#                 st.subheader(row['Product Name'])
-#                 st.write(f"📍 Location: {row['Location']}")
-#                 st.write(f"💰 Price: ₹{row['Price']}")
-#             with cols[2]:
-#                 if st.button("Add to Cart", key=f"cart_{idx}"):
-#                     st.session_state.cart.append(row['Product Name'])
-#                     st.success(f"{row['Product Name']} added to cart!")
-#                 if st.button("Add to Wishlist", key=f"wishlist_{idx}"):
-#                     st.session_state.wishlist.append(row['Product Name'])
-#                     st.info(f"{row['Product Name']} added to wishlist!")
+# # =================== Sidebar Menu ===========================
 
-# # ---------------- CART & WISHLIST ----------------
-# st.markdown("## 🛒 Your Cart")
-# if st.session_state.cart:
-#     for item in st.session_state.cart:
-#         st.markdown(f"- {item}")
-# else:
-#     st.info("Your cart is empty.")
+# st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3595/3595455.png", width=100)
+# st.sidebar.title("📦 Menu")
+# menu = st.sidebar.radio("Navigate", ["Home", "Search", "Departments", "Cart", "Wishlist", "Orders", "Logout"])
 
-# st.markdown("## ❤️ Your Wishlist")
-# if st.session_state.wishlist:
-#     for item in st.session_state.wishlist:
-#         st.markdown(f"- {item}")
-# else:
-#     st.info("Your wishlist is empty.")
+# # =================== Helper Functions =======================
+
+# def add_to_list(pid, list_name):
+#     users = load_users()
+#     email = st.session_state.user_email
+#     if pid not in users[email][list_name]:
+#         users[email][list_name].append(pid)
+#         save_users(users)
+#         st.success(f"✅ Added to {list_name}!")
+
+# def remove_from_list(pid, list_name):
+#     users = load_users()
+#     email = st.session_state.user_email
+#     if pid in users[email][list_name]:
+#         users[email][list_name].remove(pid)
+#         save_users(users)
+
+# # ====================== Pages ===============================
+
+# users = load_users()
+# user_data = users[st.session_state.user_email]
+
+# if menu == "Home":
+#     st.success("Welcome to Bhojan Bazaar. Browse fresh raw materials.")
+#     st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
+
+# elif menu == "Search":
+#     query = st.text_input("🔍 Search products")
+#     if query:
+#         filtered = products[products['name'].str.contains(query, case=False)]
+#         for _, row in filtered.iterrows():
+#             st.markdown(f"**{row.name}** - ₹{row.price} | ⭐ {row.rating}")
+#             c1, c2 = st.columns(2)
+#             with c1:
+#                 st.button("Add to Cart", key=f"cart_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'cart'))
+#             with c2:
+#                 st.button("💗 Wishlist", key=f"wish_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'wishlist'))
+
+# elif menu == "Departments":
+#     dept = st.selectbox("Select Category", products['category'].unique())
+#     filtered = products[products['category'] == dept]
+#     for _, row in filtered.iterrows():
+#         final_price = row.price * (1 - row.discount / 100)
+#         st.markdown(f"**{row.name}** | ₹{final_price:.2f} | ⭐ {row.rating} | 🏪 {row.supplier}")
+#         c1, c2 = st.columns(2)
+#         with c1:
+#             st.button("Add to Cart", key=f"dept_cart_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'cart'))
+#         with c2:
+#             st.button("💗 Wishlist", key=f"dept_wish_{row.product_id}", on_click=add_to_list, args=(row.product_id, 'wishlist'))
+
+# elif menu == "Cart":
+#     st.subheader("🛍️ Your Cart")
+#     total = 0
+#     for pid in user_data['cart']:
+#         item = products[products.product_id == pid].iloc[0]
+#         price = item.price * (1 - item.discount / 100)
+#         total += price
+#         st.write(f"{item.name} - ₹{price:.2f}")
+#     st.markdown(f"**Total: ₹{total:.2f}**")
+#     if st.button("✅ Place Order"):
+#         user_data['orders'].append({"items": user_data['cart'], "timestamp": datetime.utcnow().isoformat()})
+#         user_data['cart'] = []
+#         save_users(users)
+#         st.success("🎉 Order Placed Successfully!")
+
+# elif menu == "Wishlist":
+#     st.subheader("💖 Your Wishlist")
+#     for pid in user_data['wishlist']:
+#         item = products[products.product_id == pid].iloc[0]
+#         st.write(f"{item.name} - ₹{item.price}")
+#         c1, c2 = st.columns(2)
+#         with c1:
+#             st.button("🛒 Add to Cart", key=f"wish_cart_{pid}", on_click=add_to_list, args=(pid, 'cart'))
+#         with c2:
+#             st.button("❌ Remove", key=f"wish_remove_{pid}", on_click=remove_from_list, args=(pid, 'wishlist'))
+
+# elif menu == "Orders":
+#     st.subheader("📦 Your Orders")
+#     for order in user_data['orders']:
+#         st.markdown(f"📅 {order['timestamp']}")
+#         st.write("🛒 Items:", order['items'])
+
+# elif menu == "Logout":
+#     st.session_state.authenticated = False
+#     st.session_state.user_email = None
+#     st.success("You have been logged out.")
+#     st.experimental_rerun()
+
+
+import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
+
+# ---------------- HEADER ----------------
+st.markdown("""
+    <h1 style='text-align: center; font-weight: 700; color: #2c3e50; font-size: 40px; margin-top: 20px; margin-bottom: 0px; font-family: "Segoe UI", "Roboto", sans-serif;'>Welcome to Bhojan Bazaar</h1>
+    <h3 style='text-align: center; color: #7f8c8d; font-size: 20px; font-weight: 400; margin-bottom: 30px;'>Your Trusted Raw Material Marketplace</h3>
+""", unsafe_allow_html=True)
+
+# ---------------- SESSION ----------------
+if 'cart' not in st.session_state: st.session_state.cart = []
+if 'wishlist' not in st.session_state: st.session_state.wishlist = []
+if 'menu' not in st.session_state: st.session_state.menu = "Home"
+if 'orders' not in st.session_state:
+    st.session_state.orders = [
+        {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
+        {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
+        {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
+    ]
+if 'selected_category' not in st.session_state: st.session_state.selected_category = None
+
+# ---------------- CSS ----------------
+st.markdown("""
+    <style>
+    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background-color: #f9f9f9; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); margin-bottom: 30px; }
+    .top-bar .stButton>button { background-color: #3498db; color: white; padding: 10px 22px; border-radius: 25px; border: none; font-size: 15px; font-weight: bold; transition: 0.2s; }
+    .top-bar .stButton>button:hover { background-color: #2980b9; }
+    .top-bar .stTextInput>div>input { width: 100%; padding: 12px 20px; border-radius: 30px; border: 1px solid #ccc; font-size: 16px; outline: none; }
+    </style>
+""", unsafe_allow_html=True)
+
+# ---------------- NAV BAR ----------------
+col1, col2, col3 = st.columns([1.2, 5, 1.2])
+with col1:
+    if st.button("🏠 Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+with col2:
+    search_query = st.text_input("Search products...", "", key="search_input", label_visibility="collapsed")
+with col3:
+    if st.button("👤 Account"):
+        st.session_state.menu = "Account"
+        st.rerun()
+
+# ---------------- LOAD DATA ----------------
+products = pd.read_csv("india_products_with_locations.csv")
+
+# TEMP DEBUG: Show columns
+# st.write("Available columns:", products.columns.tolist())
+
+# Normalize column names
+products.columns = products.columns.str.strip()
+
+# Check if expected columns exist
+required_columns = ['Product Name', 'Location', 'Price']
+if not all(col in products.columns for col in required_columns):
+    st.error("❌ CSV is missing required columns: 'Product Name', 'Location', or 'Price'")
+    st.stop()
+
+# ---------------- ACCOUNT PAGE ----------------
+if st.session_state.menu == "Account":
+    st.markdown("## 👤 Account Info")
+    st.write("Name: Kalpana Patidar")
+    st.write("Email: kalpana@example.com")
+    st.markdown("### 📦 Order History")
+    for order in st.session_state.orders:
+        st.write(f"**{order['name']}** - {order['status']}")
+        if order['status'] == "Delivered":
+            st.write(f"Delivered on: {order['delivered_date']}")
+        else:
+            st.write(f"Expected by: {order['estimated_date']}")
+    st.stop()
+
+# ---------------- HOME PAGE ----------------
+if st.session_state.menu == "Home":
+    st.markdown("## 🛍️ Products")
+    if search_query:
+        filtered_products = products[products['Product Name'].str.contains(search_query, case=False, na=False)]
+    else:
+        filtered_products = products
+
+    for idx, row in filtered_products.iterrows():
+        with st.container():
+            cols = st.columns([2, 4, 2])
+            with cols[0]:
+                st.image("https://via.placeholder.com/150", width=120)
+            with cols[1]:
+                st.subheader(row['Product Name'])
+                st.write(f"📍 Location: {row['Location']}")
+                st.write(f"💰 Price: ₹{row['Price']}")
+            with cols[2]:
+                if st.button("Add to Cart", key=f"cart_{idx}"):
+                    st.session_state.cart.append(row['Product Name'])
+                    st.success(f"{row['Product Name']} added to cart!")
+                if st.button("Add to Wishlist", key=f"wishlist_{idx}"):
+                    st.session_state.wishlist.append(row['Product Name'])
+                    st.info(f"{row['Product Name']} added to wishlist!")
+
+# ---------------- CART & WISHLIST ----------------
+st.markdown("## 🛒 Your Cart")
+if st.session_state.cart:
+    for item in st.session_state.cart:
+        st.markdown(f"- {item}")
+else:
+    st.info("Your cart is empty.")
+
+st.markdown("## ❤️ Your Wishlist")
+if st.session_state.wishlist:
+    for item in st.session_state.wishlist:
+        st.markdown(f"- {item}")
+else:
+    st.info("Your wishlist is empty.")
