@@ -9,6 +9,76 @@ st.set_page_config(page_title="Bhojan Bazaar", layout="wide")
 # st.image("https://cdn.pixabay.com/photo/2021/05/26/04/43/grocery-6284031_960_720.png", use_column_width=True)
 
 # Stylish Heading & Subheading
+# st.markdown("""
+#     <h1 style='
+#         text-align: center;
+#         font-weight: 700;
+#         color: #2c3e50;
+#         font-size: 40px;
+#         margin-top: 20px;
+#         margin-bottom: 0px;
+#         font-family: "Segoe UI", "Roboto", sans-serif;
+#     '>
+#         Welcome to Bhojan Bazaar
+#     </h1>
+#     <h3 style='
+#         text-align: center;
+#         color: #7f8c8d;
+#         font-size: 20px;
+#         font-weight: 400;
+#         margin-bottom: 30px;
+#     '>
+#         Your Trusted Raw Material Marketplace
+#     </h3>
+# """, unsafe_allow_html=True)
+# # Session Setup
+# if 'cart' not in st.session_state: st.session_state.cart = []
+# if 'wishlist' not in st.session_state: st.session_state.wishlist = []
+# if 'menu' not in st.session_state: st.session_state.menu = "Home"
+# if 'orders' not in st.session_state:
+#     st.session_state.orders = [
+#         {"name": "Onion 5kg", "status": "Delivered", "delivered_date": "2025-07-25"},
+#         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
+#         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
+#     ]
+# if 'back_to_home' not in st.session_state:
+#     st.session_state.back_to_home = False
+# if 'selected_category' not in st.session_state:
+#     st.session_state.selected_category = None
+
+# # Load Data
+# products = pd.read_csv("india_products_with_locations.csv")
+
+# # Header Bar
+# header_cols = st.columns([1, 7, 1, 1, 1, 1])
+# with header_cols[0]:
+#     if st.button("🏠", help="Home"):
+#         st.session_state.menu = "Home"
+#         st.session_state.selected_category = None
+#         st.rerun()
+# with header_cols[4]:
+#     if st.button("👤 Account"):
+#         st.session_state.menu = "Account"
+
+# # Centered Search
+# st.markdown("""
+#     <style>
+#     .search-bar {
+#         display: flex;
+#         justify-content: center;
+#         # margin-bottom: 20px;
+#     }
+#     .search-bar input {
+#         width: 50% !important;
+#     }
+#     </style>
+# """, unsafe_allow_html=True)
+
+import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
+
+# ---- HEADER: Bhojan Bazaar ----
 st.markdown("""
     <h1 style='
         text-align: center;
@@ -31,7 +101,8 @@ st.markdown("""
         Your Trusted Raw Material Marketplace
     </h3>
 """, unsafe_allow_html=True)
-# Session Setup
+
+# ---- SESSION STATES ----
 if 'cart' not in st.session_state: st.session_state.cart = []
 if 'wishlist' not in st.session_state: st.session_state.wishlist = []
 if 'menu' not in st.session_state: st.session_state.menu = "Home"
@@ -41,38 +112,80 @@ if 'orders' not in st.session_state:
         {"name": "Rice 10kg", "status": "Out for Delivery", "estimated_date": (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')},
         {"name": "Oil 1L", "status": "Shipped", "estimated_date": (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')}
     ]
-if 'back_to_home' not in st.session_state:
-    st.session_state.back_to_home = False
-if 'selected_category' not in st.session_state:
-    st.session_state.selected_category = None
+if 'back_to_home' not in st.session_state: st.session_state.back_to_home = False
+if 'selected_category' not in st.session_state: st.session_state.selected_category = None
 
-# Load Data
-products = pd.read_csv("india_products_with_locations.csv")
-
-# Header Bar
-header_cols = st.columns([1, 7, 1, 1, 1, 1])
-with header_cols[0]:
-    if st.button("🏠", help="Home"):
-        st.session_state.menu = "Home"
-        st.session_state.selected_category = None
-        st.rerun()
-with header_cols[4]:
-    if st.button("👤 Account"):
-        st.session_state.menu = "Account"
-
-# Centered Search
+# ---- HEADER BAR CSS ----
 st.markdown("""
     <style>
-    .search-bar {
+    .top-bar {
         display: flex;
-        justify-content: center;
-        # margin-bottom: 20px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 30px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .search-bar input {
-        width: 50% !important;
+    .top-bar .logo {
+        font-size: 24px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .top-bar .search-input {
+        flex-grow: 1;
+        margin: 0 20px;
+    }
+    .top-bar input[type="text"] {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 25px;
+        font-size: 16px;
+        outline: none;
+    }
+    .top-bar .buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .top-bar .stButton>button {
+        background-color: #3498db;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
     }
     </style>
 """, unsafe_allow_html=True)
+
+# ---- HEADER BAR UI ----
+st.markdown('<div class="top-bar">', unsafe_allow_html=True)
+
+# Home Button
+col1, col2, col3 = st.columns([1, 5, 1.2])
+with col1:
+    if st.button("🏠 Home"):
+        st.session_state.menu = "Home"
+        st.session_state.selected_category = None
+        st.rerun()
+
+# Search Box
+with col2:
+    search_query = st.text_input("Search products...", "", key="search_input", label_visibility="collapsed")
+
+# Account Button
+with col3:
+    if st.button("👤 Account"):
+        st.session_state.menu = "Account"
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ---- Load Product Data ----
+products = pd.read_csv("india_products_with_locations.csv")
+
 
 st.markdown('<div class="search-bar">', unsafe_allow_html=True)
 search = st.text_input("", placeholder="Search 9000+ products")
