@@ -1357,22 +1357,30 @@ elif st.session_state.menu == "Cart":
         st.success("Order Placed with Cash on Delivery!")
         st.session_state.cart = []
 
-# Wishlist Page
 elif st.session_state.menu == "Wishlist":
     st.subheader("💗 Wishlist")
-    for pid in st.session_state.wishlist:
-        item = products[products['product_id'] == pid].iloc[0]
-        st.write(f"{item['name']} - ₹{item['price']}")
-        if st.button("Add to Cart", key=f"wish_to_cart_{pid}"):
-            if pid not in st.session_state.cart:
-                st.session_state.cart.append(pid)
-            st.session_state.wishlist.remove(pid)
-            st.success("🛒 Moved to Cart!")
-            st.rerun()
-        if st.button("Remove", key=f"wish_remove_{pid}"):
-            st.session_state.wishlist.remove(pid)
-            st.success("❌ Removed from Wishlist!")
-            st.rerun()
+
+    if not st.session_state.wishlist:
+        st.info("Your wishlist is empty.")
+    else:
+        for pid in st.session_state.wishlist:
+            item = products[products['product_id'] == pid].iloc[0]
+            st.write(f"{item['name']} - ₹{item['price']}")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Add to Cart", key=f"wish_to_cart_{pid}"):
+                    if pid not in st.session_state.cart:
+                        st.session_state.cart.append(pid)
+                    st.session_state.wishlist.remove(pid)
+                    st.success("🛒 Moved to Cart!")
+                    st.rerun()
+            with col2:
+                if st.button("Remove", key=f"wish_remove_{pid}"):
+                    st.session_state.wishlist.remove(pid)
+                    st.success("❌ Removed from Wishlist!")
+                    st.rerun()
+
 # Orders Page
 elif st.session_state.menu == "Orders":
     st.subheader("📦 Your Orders")
