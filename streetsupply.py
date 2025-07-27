@@ -241,105 +241,129 @@
 
 import streamlit as st
 import pandas as pd
-import random
+import uuid
 
-st.set_page_config(page_title="Street Vendor Supply Portal", layout="wide")
+st.set_page_config(page_title="Street Vendor Marketplace", layout="wide")
 
-# Sample Data
-vendors_data = {
-    "username": ["vendor1"],
-    "password": ["1234"]
-}
+# Simulated DB
+if "users" not in st.session_state:
+    st.session_state.users = {"vendor": {}, "supplier": {}}
 
-suppliers_data = pd.DataFrame({
-    "Supplier": ["Ravi Traders", "FreshMart", "Sanjay Foods"],
-    "Location": ["Indore", "Ujjain", "Indore"],
-    "Item": ["Flour", "Oil", "Tomato"],
-    "Price (per kg)": [25, 100, 15],
-    "Contact": ["9876543210", "9876512345", "9876509876"]
-})
+if "products" not in st.session_state:
+    st.session_state.products = [
+        {"id": "1", "name": "Tomato", "price": 15, "supplier": "FreshFarm"},
+        {"id": "2", "name": "Onion", "price": 20, "supplier": "AgriKart"},
+        {"id": "3", "name": "Flour", "price": 30, "supplier": "MillMart"},
+    ]
 
-# Simulate session
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+if "orders" not in st.session_state:
+    st.session_state.orders = []
 
-if "role" not in st.session_state:
-    st.session_state.role = None
+if "user" not in st.session_state:
+    st.session_state.user = None
 
-# ------------------ UI ------------------- #
+# -------------------------- Authentication -------------------------- #
 
-st.title("🍛 Street Vendor Supply Portal")
-st.markdown("Helping street food vendors find **affordable, trusted raw material suppliers.**")
+def auth_section():
+    st.sidebar.title("Login / Register")
+    role = st.sidebar.radio("Select Role", ["Vendor", "Supplier"])
+    auth_mode = st.sidebar.radio("Mode", ["Login", "Register"])
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type="password")
 
-# ------------------ Login / Register ------------------- #
-with st.sidebar:
-    st.header("Login / Register")
+    if st.sidebar.button(auth_mode):
+        if auth_mode == "Register":
+            if username in st.session_state.users[role]:
+                st.sidebar.error("User already exists!")
+            else:
+                st.session_state.users[role][username] = {"password": password}
+                st.sidebar.success("Registered successfully!")
+        elif auth_mode == "Login":
+            user = st.session_state.users[role].get(username)
+            if user and user["password"] == password:
+                st.session_state.user = {"username": username, "role": role}
+                st.sidebar.success("Logged in as " + role)
+            else:
+                st.sidebar.error("Invalid credentials")
 
-    role = st.radio("Who are you?", ["Vendor", "Supplier"])
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+auth_section()
 
-    if st.button("Login"):
-        if role == "Vendor" and username in vendors_data["username"]:
-            idx = vendors_data["username"].index(username)
-            if vendors_data["password"][idx] == password:
-                st.success("Logged in as Vendor")
-                st.session_state.logged_in = True
-                st.session_state.role = "vendor"
-        elif role == "Supplier" and username == "supplier" and password == "1234":
-            st.success("Logged in as Supplier")
-            st.session_state.logged_in = True
-            st.session_state.role = "supplier"
-        else:
-            st.error("Invalid credentials!")
+# -------------------------- Vendor Dashboard -------------------------- #
+def vendor_dashboard():
+    st.title("🛒 Vendor Marketplace")
+    st.subheader("Welcome, " + st.session_state.user["username"])
 
-# ------------------ Vendor Dashboard ------------------- #
-if st.session_state.logged_in and st.session_state.role == "vendor":
-    st.subheader("🔍 Find Suppliers by Location")
+    df = pd.DataFrame(st.session_state.products)
+    st.write("### 🧺 Available Products")
+    selected = st.multiselect("Select items to add to cart", df["name"].tolist())
 
-    location = st.selectbox("Choose your location:", suppliers_data["Location"].unique())
-    filtered = suppliers_data[suppliers_data["Location"] == location]
+    payment_mode = st.radio("Payment Option", ["Online", "Cash on Delivery"])
 
-    st.write("### 🛒 Available Suppliers")
-    st.dataframe(filtered)
+    if st.button("Place Order"):
+        order_id = str(uuid.uuid4())[:8]
+        items = [item for item in st.session_state.products if item["name"] in selected]
+        order = {
+            "id": order_id,
+            "vendor": st.session_state.user["username"],
+            "items": items,
+            "status": "Order Placed",
+            "payment": payment_mode,
+            "supplier": items[0]["supplier"] if items else "Unknown"
+        }
+        st.session_state.orders.append(order)
+        st.success(f"✅ Order placed! Tracking ID: {order_id}")
 
-    if st.button("Place Group Order"):
-        st.success("✅ Group Order Placed! Supplier will contact you soon.")
+    st.write("### 🚚 Your Orders")
+    user_orders = [o for o in st.session_state.orders if o["vendor"] == st.session_state.user["username"]]
+    for o in user_orders:
+        st.info(f"🧾 Order ID: {o['id']} | Status: {o['status']} | Payment: {o['payment']}")
+        for item in o["items"]:
+            st.write(f"  • {item['name']} - ₹{item['price']} from {item['supplier']}")
 
-# ------------------ Supplier Dashboard ------------------- #
-if st.session_state.logged_in and st.session_state.role == "supplier":
-    st.subheader("📦 Supplier Dashboard")
-    st.write("Update or Add New Raw Materials")
+# -------------------------- Supplier Dashboard -------------------------- #
+def supplier_dashboard():
+    st.title("🏭 Supplier Panel")
+    st.subheader("Welcome, " + st.session_state.user["username"])
 
-    with st.form("supplier_form"):
-        name = st.text_input("Supplier Name")
-        loc = st.text_input("Location")
-        item = st.text_input("Raw Material")
-        price = st.number_input("Price per kg", min_value=1)
-        contact = st.text_input("Contact Number")
-        submit = st.form_submit_button("Add/Update")
+    st.write("### 📦 Your Products")
+    my_products = [p for p in st.session_state.products if p["supplier"] == st.session_state.user["username"]]
+    if my_products:
+        st.table(pd.DataFrame(my_products))
+    else:
+        st.warning("You have no products listed yet.")
 
-        if submit:
-            new_row = pd.DataFrame({
-                "Supplier": [name],
-                "Location": [loc],
-                "Item": [item],
-                "Price (per kg)": [price],
-                "Contact": [contact]
-            })
-            suppliers_data = pd.concat([suppliers_data, new_row], ignore_index=True)
-            st.success("Updated product list!")
+    with st.expander("➕ Add Product"):
+        name = st.text_input("Item Name")
+        price = st.number_input("Price", min_value=1)
+        if st.button("Add Product"):
+            new_prod = {"id": str(uuid.uuid4())[:5], "name": name, "price": price, "supplier": st.session_state.user["username"]}
+            st.session_state.products.append(new_prod)
+            st.success("Product Added!")
 
-    st.write("### 📋 Current Listings")
-    st.dataframe(suppliers_data)
+    st.write("### 📥 Incoming Orders")
+    my_orders = [o for o in st.session_state.orders if o["supplier"] == st.session_state.user["username"]]
 
-# ------------------ Footer ------------------- #
-st.markdown("---")
-st.caption("Built in 2 hours for Tutedude Web Hackathon 1.0 🚀")
+    for order in my_orders:
+        st.info(f"Order ID: {order['id']} | Status: {order['status']} | Payment: {order['payment']}")
+        for item in order["items"]:
+            st.write(f"• {item['name']} - ₹{item['price']}")
 
+        if order["status"] != "Delivered":
+            new_status = st.selectbox(f"Update status for Order {order['id']}", ["Processing", "Out for Delivery", "Delivered"])
+            if st.button(f"Update {order['id']}"):
+                order["status"] = new_status
+                st.success(f"Order {order['id']} updated to {new_status}")
 
+# -------------------------- Main Layout -------------------------- #
 
-
+if st.session_state.user:
+    if st.session_state.user["role"] == "vendor":
+        vendor_dashboard()
+    elif st.session_state.user["role"] == "supplier":
+        supplier_dashboard()
+else:
+    st.title("🍽️ Welcome to Street Vendor Sourcing Portal")
+    st.markdown("Login or register from the sidebar to continue.")
 
   
  
